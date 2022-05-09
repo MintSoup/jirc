@@ -124,13 +124,16 @@ public class MainWindow extends JFrame {
     }
 
     private void append(JTextPane chat, Message m){
-        StyledDocument doc = chat.getStyledDocument();
-        SimpleAttributeSet keyWord = new SimpleAttributeSet();
-        StyleConstants.setForeground(keyWord, Color.BLACK);
-        //StyleConstants.setBackground(keyWord, Color.YELLOW);
-        StyleConstants.setBold(keyWord, true);
         try {
-            doc.insertString(doc.getLength(), m.toString() + "\n", keyWord);
+            StyledDocument doc = chat.getStyledDocument();
+            SimpleAttributeSet keyWord = new SimpleAttributeSet();
+            StyleConstants.setBold(keyWord, true);
+            StyleConstants.setForeground(keyWord, Color.BLUE);
+            doc.insertString(doc.getLength(), "[" + Message.DATE_FORMAT.format(m.getTimestamp()) + "]", keyWord);
+            StyleConstants.setForeground(keyWord, Color.ORANGE);
+            doc.insertString(doc.getLength(), "<" + m.getSender() + ">", keyWord);
+            StyleConstants.setForeground(keyWord, Color.BLACK);
+            doc.insertString(doc.getLength(), m.getContent() + "\n", keyWord);
         } catch (BadLocationException e) {
             throw new RuntimeException(e);
         }

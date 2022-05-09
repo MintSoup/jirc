@@ -10,7 +10,7 @@ public class Message implements Comparable<Message> {
 	private final String content;
 	private final Date timestamp;
 
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
+	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
 	public Message(String sender, String channel, String content, Date timestamp) {
 		this.sender = sender;
