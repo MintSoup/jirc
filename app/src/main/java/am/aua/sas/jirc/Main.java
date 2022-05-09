@@ -3,8 +3,25 @@
  */
 package am.aua.sas.jirc;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
+
+import am.aua.sas.jirc.irc.IRCClient;
+import am.aua.sas.jirc.irc.IRCException;
+
 public class Main {
-	public static void main(String[] args) {
-		System.out.println("hello world");
+	public static void main(String[] args) throws IRCException {
+		IRCClient c = new IRCClient("irc.libera.chat", 6667, "JIRC_bot");
+		try {
+			c.open();
+			System.out.println("helo");
+			c.join("#test");
+			c.sendMessage("#test", "Hello, world!");
+			// c.sendMessage("mintsoup", "helo areg");
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

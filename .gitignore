@@ -8,3 +8,5 @@ build
 .dir-locals.el
 .project
 .settings/
+/app/.classpath
+/app/bin/
