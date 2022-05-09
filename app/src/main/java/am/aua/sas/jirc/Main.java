@@ -14,10 +14,23 @@ public class Main {
 		IRCClient c = new IRCClient("irc.libera.chat", 6667, "JIRC_bot");
 		try {
 			c.open();
-			System.out.println("helo");
 			c.join("#test");
 			c.sendMessage("#test", "Hello, world!");
-			// c.sendMessage("mintsoup", "helo areg");
+			c.listenForMessages((r, m) -> {
+				// System.out.println(r);
+				if (m != null) {
+					System.out.println(m);
+					if (m.getContent().equals("hello")) {
+						try {
+							c.sendMessage(m.getChannel(), "Hello, " + m.getSender() + "!");
+							return true;
+						} catch (IOException e) {
+						}
+					}
+				}
+				return false;
+			});
+			c.quit();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

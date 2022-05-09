@@ -7,12 +7,15 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import am.aua.sas.jirc.irc.commands.Command;
 import am.aua.sas.jirc.irc.commands.Join;
 import am.aua.sas.jirc.irc.commands.Nick;
+import am.aua.sas.jirc.irc.commands.Pong;
 import am.aua.sas.jirc.irc.commands.PrivMsg;
+import am.aua.sas.jirc.irc.commands.Quit;
 import am.aua.sas.jirc.irc.commands.User;
 
 public class IRCClient {
@@ -32,7 +35,7 @@ public class IRCClient {
 
 	public List<String> channels;
 
-	private List<String> lines;
+	private List<String> log;
 
 	public IRCClient() {
 		this(DEFAULT_SERVER, DEFAULT_PORT, DEFAULT_USERNAME);
@@ -43,7 +46,7 @@ public class IRCClient {
 		this.port = port;
 		this.nick = username;
 		this.channels = new ArrayList<String>();
-		this.lines = new ArrayList<String>();
+		this.log = new ArrayList<String>();
 	}
 
 	public void open() throws UnknownHostException, IOException, IRCException {
@@ -75,11 +78,47 @@ public class IRCClient {
 		writeCommand(cmd);
 	}
 
+	public void listenForMessages(IMessageListener ml) throws IOException {
+		while (true) {
+			String line = readLine();
+			if (handlePing(line))
+				continue;
+			Message m = parseMessage(line);
+			if (ml.handleMessage(line, m))
+				break;
+
+		}
+	}
+
+	private boolean handlePing(String line) throws IOException {
+		String[] arr = line.split(" ");
+		if (arr[0] != "PING")
+			return false;
+
+		Pong pong = new Pong(line.substring(line.indexOf(' ') + 1));
+		writeCommand(pong);
+		return true;
+	}
+
+	private Message parseMessage(String line) {
+		try {
+			String[] headBody = line.split(":");
+			String[] head = headBody[1].split(" ");
+			if (!head[1].equals("PRIVMSG"))
+				return null;
+			String user = head[0].substring(0, head[0].indexOf('!'));
+			String channel = head[2];
+
+			return new Message(user, channel, headBody[2], new Date());
+		} catch (StringIndexOutOfBoundsException | ArrayIndexOutOfBoundsException e) {
+			return null; // :\
+		}
+	}
+
 	private void registerUser() throws IOException, IRCException {
 		User usercmd = new User(this.nick);
-		Nick nickcmd = updateNickname(nick);
 		writeCommand(usercmd);
-		updateNickname(nick);
+		Nick nickcmd = updateNickname(nick);
 		int[] logonSequence = { Command.NumericReplies.RPL_WELCOME, Command.NumericReplies.RPL_YOURHOST,
 				Command.NumericReplies.RPL_CREATED, Command.NumericReplies.RPL_MYINFO, };
 
@@ -98,7 +137,7 @@ public class IRCClient {
 			}
 	}
 
-	public void writeCommand(Command c) throws IOException {
+	private void writeCommand(Command c) throws IOException {
 		out.println(c.getText());
 		out.flush();
 		System.out.println("[SEND] " + c.getText());
@@ -106,8 +145,7 @@ public class IRCClient {
 
 	private String readLine() throws IOException {
 		String line = in.readLine();
-		lines.add(line);
-		System.out.println(line);
+		log.add(line);
 		return line;
 	}
 
@@ -127,7 +165,6 @@ public class IRCClient {
 		while ((line = readLine()) != null) {
 			try {
 				int n = Integer.parseInt(line.split(" ")[1]);
-				System.out.println(n);
 				for (int[] r : replies)
 					for (int reply : r)
 						if (reply == n)
@@ -140,6 +177,7 @@ public class IRCClient {
 	}
 
 	public void quit() throws IOException {
+		writeCommand(new Quit());
 		in.close();
 		out.close();
 		socket.close();
@@ -155,5 +193,9 @@ public class IRCClient {
 
 	public int getPort() {
 		return port;
+	}
+
+	public List<String> getLog() {
+		return log;
 	}
 }
