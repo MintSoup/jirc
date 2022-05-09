@@ -2,7 +2,7 @@ package am.aua.sas.jirc.irc.commands;
 
 public abstract class Command {
 
-	public final class NumericReplies {
+	public static final class NumericReplies {
 		public static final int RPL_WELCOME = 001;
 		public static final int RPL_YOURHOST = 002;
 		public static final int RPL_CREATED = 003;
@@ -142,11 +142,14 @@ public abstract class Command {
 		public static final int ERR_USERSDONTMATCH = 502;
 	}
 
-	public enum IRC_COMMAND {
-		NICK, USER, JOIN, PRIVMSG,
+	public enum IrcCommand {
+		NICK,
+		USER,
+		JOIN,
+		PRIVMSG,
 	}
 
-	protected IRC_COMMAND cmd;
+	protected IrcCommand cmd;
 
 	public abstract String getText();
 
