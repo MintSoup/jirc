@@ -5,6 +5,10 @@ import am.aua.sas.jirc.irc.IRCException;
 import am.aua.sas.jirc.irc.Message;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.io.IOException;
 import java.util.Date;
@@ -43,8 +47,9 @@ public class MainWindow extends JFrame {
         this.add(channels, BorderLayout.WEST);
 
         JPanel center = new JPanel(new GridBagLayout());
-        JTextArea chat = new JTextArea();
-        chat.setEnabled(false);
+        JTextPane chat = new JTextPane();
+        chat.setContentType("text/html");
+        chat.setEditable(false);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -62,7 +67,7 @@ public class MainWindow extends JFrame {
                 throw new RuntimeException(ex);
             }
             Message m = new Message(client.getNickname(), "#test", message.getText(), new Date());
-            chat.append(m + "\n");
+            append(chat, m);
             message.setText("");
         });
         gbc.gridx = 0;
@@ -101,16 +106,13 @@ public class MainWindow extends JFrame {
             try {
                 client.listenForMessages((r, m) -> {
                     if (m != null)
-                        chat.append(m.toString());
-                    else
-                        chat.append(r);
-                    chat.append("\n");
+                        append(chat, m);
                     return false;
                 });
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        });
+        }, "Message Receiver");
         flow.start();
     }
 
@@ -118,6 +120,19 @@ public class MainWindow extends JFrame {
         for (int i = 0; i < names.length; i++){
             JButton temp = new JButton(names[i]);
             panel.add(temp);
+        }
+    }
+
+    private void append(JTextPane chat, Message m){
+        StyledDocument doc = chat.getStyledDocument();
+        SimpleAttributeSet keyWord = new SimpleAttributeSet();
+        StyleConstants.setForeground(keyWord, Color.BLACK);
+        //StyleConstants.setBackground(keyWord, Color.YELLOW);
+        StyleConstants.setBold(keyWord, true);
+        try {
+            doc.insertString(doc.getLength(), m.toString() + "\n", keyWord);
+        } catch (BadLocationException e) {
+            throw new RuntimeException(e);
         }
     }
 
