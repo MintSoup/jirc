@@ -1,6 +1,9 @@
 package am.aua.sas.jirc.gui;
 
 public final class Strings {
+    public static final String FILE_MENU_LABEL = "File";
+    public static final String ABOUT_MENU_ITEM_LABEL = "About";
+
     public static final String CONNECTION_FORM_TITLE = "Connect to a server";
     public static final String CONNECTION_FORM_BUTTON_OKAY = "Connect";
     public static final String CONNECTION_ERROR_MESSAGE = "Connection rejected.";

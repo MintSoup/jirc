@@ -1,12 +1,18 @@
 package am.aua.sas.jirc.gui;
 
+import am.aua.sas.jirc.irc.IRCClient;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class MainWindow extends JFrame {
     private static GridBagConstraints gbc = new GridBagConstraints();
 
-    public MainWindow(){
+    private IRCClient client;
+
+    public MainWindow(IRCClient client) {
+        this.client = client;
+
         this.setSize(1080, 1080);
         this.setTitle("Jirc");
         //this.setResizable(false);
@@ -15,9 +21,9 @@ public class MainWindow extends JFrame {
 
         JMenuBar menu = new JMenuBar();
 
-        JMenu jirc = new JMenu("Jirc");
+        JMenu jirc = new JMenu(Strings.FILE_MENU_LABEL);
 
-        JMenuItem about = new JMenuItem("About");
+        JMenuItem about = new JMenuItem(Strings.ABOUT_MENU_ITEM_LABEL);
         about.addActionListener((e) -> new AboutWindow());
         jirc.add(about);
 
@@ -28,7 +34,7 @@ public class MainWindow extends JFrame {
          */
 
         menu.add(jirc);
-        menu.add(new JMenu("View"));
+//        menu.add(new JMenu("View"));
         this.setJMenuBar(menu);
 
         String[] buttons = new String[]{"Dummy1", "Dummy2", "Dummy3"};
