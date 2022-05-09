@@ -8,6 +8,7 @@ import java.net.UnknownHostException;
 
 import am.aua.sas.jirc.irc.IRCClient;
 import am.aua.sas.jirc.irc.IRCException;
+import am.aua.sas.jirc.gui.JircGui;
 
 public class Main {
 	public static void main(String[] args) throws IRCException {
@@ -23,5 +24,7 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	public static void main(String[] args) {
+		JircGui gui = new JircGui();
 	}
 }
