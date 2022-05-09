@@ -51,6 +51,7 @@ public class IRCClient {
 
 	public void open() throws UnknownHostException, IOException, IRCException {
 		socket = new Socket(server, port);
+		socket.setSoTimeout(0);
 
 		out = new PrintWriter(socket.getOutputStream());
 		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -92,7 +93,7 @@ public class IRCClient {
 
 	private boolean handlePing(String line) throws IOException {
 		String[] arr = line.split(" ");
-		if (arr[0] != "PING")
+		if (!arr[0].equals("PING"))
 			return false;
 
 		Pong pong = new Pong(line.substring(line.indexOf(' ') + 1));
