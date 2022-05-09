@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 public class Server implements Serializable {
     private final String hostname;
-    private final String port;
+    private final int port;
 
-    public Server(String hostname, String port) {
+    public Server(String hostname, int port) {
         this.hostname = hostname;
         this.port = port;
     }
@@ -19,7 +19,7 @@ public class Server implements Serializable {
         return hostname;
     }
 
-    public String getPort() {
+    public int getPort() {
         return port;
     }
 

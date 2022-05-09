@@ -1,11 +1,15 @@
 package am.aua.sas.jirc.gui;
 
 import am.aua.sas.jirc.Server;
+import am.aua.sas.jirc.irc.IRCClient;
+import am.aua.sas.jirc.irc.IRCException;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.Objects;
 
 public class ConnectionForm extends JFrame {
     private static final Dimension SIZE = new Dimension(400, 200);
@@ -15,7 +19,7 @@ public class ConnectionForm extends JFrame {
 
     // TODO: Read from disk
     private final Server[] servers = {
-            new Server("irc.libera.chat", "6667"),
+            new Server(IRCClient.DEFAULT_SERVER, IRCClient.DEFAULT_PORT),
     };
 
     public ConnectionForm() {
@@ -24,26 +28,29 @@ public class ConnectionForm extends JFrame {
         this.initActionsPanel();
 
         JLabel serverListLabel = new FormLabel(Strings.SERVER_LABEL);
-        JComboBox<Server> server = new JComboBox<>(this.servers);
-        server.setEditable(true);
-        server.setSelectedIndex(0); // TODO: Select last used
-        server.addActionListener(new ActionListener() {
+        JComboBox<Server> serverField = new JComboBox<>(this.servers);
+        serverField.setEditable(true);
+        serverField.setSelectedIndex(0); // TODO: Select last used
+        serverField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO: Save to disk
                 if (e.getActionCommand().equals("comboBoxEdited")) {
-                    Object newItem = server.getSelectedItem();
+                    Object newItem = serverField.getSelectedItem();
                     if (newItem != null && !newItem.toString().trim().equals("")) {
-                        Server newServer = new Server(newItem.toString(), "6667");
-                        server.addItem(newServer);
-                        server.setSelectedItem(newServer);
+                        Server newServer = new Server(newItem.toString(), IRCClient.DEFAULT_PORT);
+                        serverField.addItem(newServer);
+                        serverField.setSelectedItem(newServer);
+                    } else {
+                        Server newServer = new Server(IRCClient.DEFAULT_SERVER, IRCClient.DEFAULT_PORT);
+                        serverField.setSelectedItem(newServer);
                     }
                 }
             }
         });
 
         // TODO: Abstract away
-        server.setPreferredSize(new Dimension(200, server.getPreferredSize().height));
+        serverField.setPreferredSize(new Dimension(200, serverField.getPreferredSize().height));
 
         final Insets labelInsets = new Insets(10, 0, 0, 4);
         final Insets fieldInsets = new Insets(10, 0, 0, 0);
@@ -58,21 +65,10 @@ public class ConnectionForm extends JFrame {
         this.contentPanel.add(serverListLabel, c);
         c.gridx = 1;
         c.insets = fieldInsets;
-        this.contentPanel.add(server, c);
-
-        JLabel nicknameLabel = new FormLabel(Strings.NICKNAME_LABEL);
-        JTextField nickname = new JTextField();
-
-        c.gridy++;
-        c.gridx = 0;
-        c.insets = labelInsets;
-        this.contentPanel.add(nicknameLabel, c);
-        c.gridx = 1;
-        c.insets = fieldInsets;
-        this.contentPanel.add(nickname, c);
+        this.contentPanel.add(serverField, c);
 
         JLabel usernameLabel = new FormLabel(Strings.USERNAME_LABEL);
-        JTextField username = new JTextField();
+        JTextField usernameField = new JTextField();
 
         c.gridy++;
         c.gridx = 0;
@@ -80,13 +76,44 @@ public class ConnectionForm extends JFrame {
         this.contentPanel.add(usernameLabel, c);
         c.gridx = 1;
         c.insets = fieldInsets;
-        this.contentPanel.add(username, c);
+        this.contentPanel.add(usernameField, c);
 
         JButton continueButton = new JButton(Strings.CONNECTION_FORM_BUTTON_OKAY);
         continueButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                // TODO: Add connection logic and switch windows
+                Server selectedServer = (Server) Objects.requireNonNull(serverField.getSelectedItem());
+                String username = usernameField.getText();
+                if (username.trim().equals("")) {
+                    JOptionPane.showMessageDialog(
+                            ConnectionForm.this,
+                            Strings.BLANK_USERNAME_ERROR_MESSAGE,
+                            Strings.ERROR_TITLE,
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+
+                JircGui.client = new IRCClient(selectedServer.getHostname(), selectedServer.getPort(), username);
+                try {
+                    JircGui.client.open();
+                    JircGui.hide(ConnectionForm.this);
+                    JircGui.show(new MainWindow());
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(
+                            ConnectionForm.this,
+                            Strings.CONNECTION_ERROR_MESSAGE,
+                            Strings.ERROR_TITLE,
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                } catch (IRCException e) {
+                    JOptionPane.showMessageDialog(
+                            ConnectionForm.this,
+                            Strings.DUPLICATE_USERNAME_ERROR_MESSAGE,
+                            Strings.ERROR_TITLE,
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
             }
         });
         this.actionsPanel.add(continueButton);
