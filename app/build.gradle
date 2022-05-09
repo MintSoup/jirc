@@ -1,5 +1,5 @@
 plugins {
-    id 'application'
+    id "application"
 }
 
 repositories {
@@ -9,5 +9,5 @@ dependencies {
 }
 
 application {
-    mainClass = 'am.aua.sas.jirc.Main'
+    mainClass = "am.aua.sas.jirc.Main"
 }
