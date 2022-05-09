@@ -9,8 +9,9 @@ public class MainWindow extends JFrame {
     public MainWindow(){
         this.setSize(1080, 1080);
         this.setTitle("Jirc");
+        //this.setResizable(false);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setLayout(new GridBagLayout());
+        this.setLayout(new BorderLayout(5,5));
 
         JMenuBar menu = new JMenuBar();
 
@@ -30,44 +31,47 @@ public class MainWindow extends JFrame {
         menu.add(new JMenu("View"));
         this.setJMenuBar(menu);
 
-        JPanel channels = new JPanel();
-        channels.setLayout(new GridBagLayout());
+        String[] buttons = new String[]{"Dummy1", "Dummy2", "Dummy3"};
+        JList<String> channels = new JList<>(buttons);
+        channels.setBackground(Color.GRAY);
+        channels.setPreferredSize(new Dimension(100, 640));
+        //channelsPrinter(channels, new String[]{"Dummy1", "Dummy2", "Dummy3"});
+        this.add(channels, BorderLayout.WEST);
 
-        channelsPrinter(channels, new String[]{"Dummy1", "Dummy2", "Dummy3"});
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        this.add(channels, gbc);
-
-        JTextArea chat = new JTextArea(40, 60);
+        JPanel center = new JPanel(new GridBagLayout());
+        JTextArea chat = new JTextArea();
         chat.setEnabled(false);
 
         showMessage(chat, new String[]{"09.05.2022", "Suren2003ah", "helo"});
-
-        gbc.gridx = 1;
+        gbc.gridx = 0;
         gbc.gridy = 0;
-        this.add(chat, gbc);
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        center.add(chat, gbc);
 
-        JPanel messageBox = new JPanel();
         JTextField message = new JTextField();
-        JButton send = new JButton("Send");
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 1;
+        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        center.add(message, gbc);
+
+        /*JButton send = new JButton("Send");
         send.addActionListener((e) -> {
             showMessage(chat, new String[]{"09.05.2022", "Suren2003ah", message.getText()});
             message.setText("");
-        });
-        message.setColumns(50);
-        messageBox.add(message);
-        messageBox.add(send);
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        this.add(messageBox, gbc);
+        });*/
+        //messageBox.add(send);
+        this.add(center, BorderLayout.CENTER);
 
-        JPanel status = new JPanel();
-        status.setLayout(new GridBagLayout());
-        peoplePrinter(status, new String[]{"Suren2003ah", "MintSoup", "Anton LaVel"});
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        this.add(status, gbc);
+        String[] arr = new String[]{"Suren2003ah", "MintSoup", "Anton LaVel"};
+        JList<String> status = new JList<>(arr);
+        status.setPreferredSize(new Dimension(200, chat.getPreferredSize().height));
+        status.setBackground(Color.GRAY);
+
+        this.add(status, BorderLayout.EAST);
 
         this.setVisible(true);
     }
@@ -75,9 +79,7 @@ public class MainWindow extends JFrame {
     private void channelsPrinter(JPanel panel, String[] names){
         for (int i = 0; i < names.length; i++){
             JButton temp = new JButton(names[i]);
-            gbc.gridx = 0;
-            gbc.gridy = i;
-            panel.add(temp, gbc);
+            panel.add(temp);
         }
     }
 
@@ -88,9 +90,7 @@ public class MainWindow extends JFrame {
     private void peoplePrinter(JPanel panel, String[] people){
         for (int i = 0; i < people.length; i++){
             JLabel temp = new JLabel("<html> " + people[i] + " <br><br> </html>");
-            gbc.gridx = 0;
-            gbc.gridy = i;
-            panel.add(temp, gbc);
+            panel.add(temp);
         }
     }
 }

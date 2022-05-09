@@ -4,6 +4,7 @@
 package am.aua.sas.jirc;
 
 import am.aua.sas.jirc.gui.JircGui;
+import am.aua.sas.jirc.gui.MainWindow;
 import am.aua.sas.jirc.irc.IRCClient;
 import am.aua.sas.jirc.irc.IRCException;
 
@@ -12,7 +13,7 @@ import java.net.UnknownHostException;
 
 public class Main {
 	public static void main(String[] args) throws IRCException {
-		JircGui gui = new JircGui();
+		/*JircGui gui = new JircGui();
 
 		IRCClient c = new IRCClient("irc.libera.chat", 6667, "JIRC_bot");
 		try {
@@ -38,6 +39,7 @@ public class Main {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
+		new MainWindow();
 	}
 }
