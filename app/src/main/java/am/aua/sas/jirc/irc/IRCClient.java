@@ -107,7 +107,16 @@ public class IRCClient {
 			if (!head[1].equals("PRIVMSG"))
 				return null;
 			String user = head[0].substring(0, head[0].indexOf('!'));
-			String channel = head[2];
+			String channel;
+
+			// for DMs the channel gets set to
+			// our username. This is not very useful
+			// (or logical), so if it's a DM we set the
+			// channel to the username of the sender
+			if (head[2].startsWith("#"))
+				channel = head[2];
+			else
+				channel = user;
 
 			return new Message(user, channel, headBody[2], new Date());
 		} catch (StringIndexOutOfBoundsException | ArrayIndexOutOfBoundsException e) {
