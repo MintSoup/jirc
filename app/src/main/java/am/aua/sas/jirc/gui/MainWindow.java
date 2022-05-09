@@ -21,12 +21,6 @@ public class MainWindow extends JFrame {
         about.addActionListener((e) -> new AboutWindow());
         jirc.add(about);
 
-        /* testing purposes
-        JMenuItem title = new JMenuItem("Change The Title");
-        title.addActionListener((e) -> this.setTitle("lmao"));
-        jirc.add(title);
-         */
-
         menu.add(jirc);
         menu.add(new JMenu("View"));
         this.setJMenuBar(menu);
@@ -51,6 +45,11 @@ public class MainWindow extends JFrame {
         center.add(chat, gbc);
 
         JTextField message = new JTextField();
+        // add placeholder here
+        message.addActionListener((e) -> {
+            showMessage(chat, new String[]{"09.05.2022", "Suren2003ah", message.getText()});
+            message.setText("");
+        });
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 1;
@@ -66,12 +65,12 @@ public class MainWindow extends JFrame {
         //messageBox.add(send);
         this.add(center, BorderLayout.CENTER);
 
-        String[] arr = new String[]{"Suren2003ah", "MintSoup", "Anton LaVel"};
+        /*String[] arr = new String[]{"Suren2003ah", "MintSoup", "Anton LaVel"};
         JList<String> status = new JList<>(arr);
         status.setPreferredSize(new Dimension(200, chat.getPreferredSize().height));
         status.setBackground(Color.GRAY);
 
-        this.add(status, BorderLayout.EAST);
+        this.add(status, BorderLayout.EAST);*/
 
         this.setVisible(true);
     }
