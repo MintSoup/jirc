@@ -1,12 +1,22 @@
 package am.aua.sas.jirc.gui;
 
+import am.aua.sas.jirc.irc.IRCClient;
+import am.aua.sas.jirc.irc.IRCException;
+import am.aua.sas.jirc.irc.Message;
+
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.util.Date;
 
 public class MainWindow extends JFrame {
     private static GridBagConstraints gbc = new GridBagConstraints();
 
-    public MainWindow(){
+    private final IRCClient client;
+
+    public MainWindow(IRCClient client) {
+        this.client = client;
+
         this.setSize(1080, 1080);
         this.setTitle("Jirc");
         //this.setResizable(false);
@@ -15,14 +25,14 @@ public class MainWindow extends JFrame {
 
         JMenuBar menu = new JMenuBar();
 
-        JMenu jirc = new JMenu("Jirc");
+        JMenu jirc = new JMenu(Strings.FILE_MENU_LABEL);
 
-        JMenuItem about = new JMenuItem("About");
+        JMenuItem about = new JMenuItem(Strings.ABOUT_MENU_ITEM_LABEL);
         about.addActionListener((e) -> new AboutWindow());
         jirc.add(about);
 
         menu.add(jirc);
-        menu.add(new JMenu("View"));
+//        menu.add(new JMenu("View"));
         this.setJMenuBar(menu);
 
         String[] buttons = new String[]{"Dummy1", "Dummy2", "Dummy3"};
@@ -36,7 +46,6 @@ public class MainWindow extends JFrame {
         JTextArea chat = new JTextArea();
         chat.setEnabled(false);
 
-        showMessage(chat, new String[]{"09.05.2022", "Suren2003ah", "helo"});
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1;
@@ -47,7 +56,13 @@ public class MainWindow extends JFrame {
         JTextField message = new JTextField();
         // add placeholder here
         message.addActionListener((e) -> {
-            showMessage(chat, new String[]{"09.05.2022", "Suren2003ah", message.getText()});
+            try {
+                client.sendMessage("#test", message.getText());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            Message m = new Message(client.getNickname(), "#test", message.getText(), new Date());
+            chat.append(m + "\n");
             message.setText("");
         });
         gbc.gridx = 0;
@@ -73,6 +88,30 @@ public class MainWindow extends JFrame {
         this.add(status, BorderLayout.EAST);*/
 
         this.setVisible(true);
+
+        try {
+            client.join("#test");
+        } catch (IRCException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Thread flow = new Thread(() -> {
+            try {
+                client.listenForMessages((r, m) -> {
+                    if (m != null)
+                        chat.append(m.toString());
+                    else
+                        chat.append(r);
+                    chat.append("\n");
+                    return false;
+                });
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        flow.start();
     }
 
     private void channelsPrinter(JPanel panel, String[] names){
@@ -80,10 +119,6 @@ public class MainWindow extends JFrame {
             JButton temp = new JButton(names[i]);
             panel.add(temp);
         }
-    }
-
-    private void showMessage(JTextArea area, String[] messageInfo){
-        area.append("[" + messageInfo[0] + "] <" + messageInfo[1] + ">: " + messageInfo[2] + "\n");
     }
 
     private void peoplePrinter(JPanel panel, String[] people){

@@ -1,12 +1,8 @@
 package am.aua.sas.jirc.gui;
 
-import am.aua.sas.jirc.irc.IRCClient;
-
 import javax.swing.*;
 
 public class JircGui {
-    public static IRCClient client;
-
     public JircGui() {
         ConnectionForm loginForm = new ConnectionForm();
         show(loginForm);

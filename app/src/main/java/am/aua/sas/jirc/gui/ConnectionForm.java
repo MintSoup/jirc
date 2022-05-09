@@ -85,34 +85,19 @@ public class ConnectionForm extends JFrame {
                 Server selectedServer = (Server) Objects.requireNonNull(serverField.getSelectedItem());
                 String username = usernameField.getText();
                 if (username.trim().equals("")) {
-                    JOptionPane.showMessageDialog(
-                            ConnectionForm.this,
-                            Strings.BLANK_USERNAME_ERROR_MESSAGE,
-                            Strings.ERROR_TITLE,
-                            JOptionPane.ERROR_MESSAGE
-                    );
+                    showErrorMessage(Strings.BLANK_USERNAME_ERROR_MESSAGE);
                     return;
                 }
 
-                JircGui.client = new IRCClient(selectedServer.getHostname(), selectedServer.getPort(), username);
+                IRCClient client = new IRCClient(selectedServer.getHostname(), selectedServer.getPort(), username);
                 try {
-                    JircGui.client.open();
+                    client.open();
                     JircGui.hide(ConnectionForm.this);
-                    JircGui.show(new MainWindow());
+                    JircGui.show(new MainWindow(client));
                 } catch (IOException e) {
-                    JOptionPane.showMessageDialog(
-                            ConnectionForm.this,
-                            Strings.CONNECTION_ERROR_MESSAGE,
-                            Strings.ERROR_TITLE,
-                            JOptionPane.ERROR_MESSAGE
-                    );
+                    showErrorMessage(Strings.CONNECTION_ERROR_MESSAGE);
                 } catch (IRCException e) {
-                    JOptionPane.showMessageDialog(
-                            ConnectionForm.this,
-                            Strings.DUPLICATE_USERNAME_ERROR_MESSAGE,
-                            Strings.ERROR_TITLE,
-                            JOptionPane.ERROR_MESSAGE
-                    );
+                    showErrorMessage(Strings.DUPLICATE_USERNAME_ERROR_MESSAGE);
                 }
             }
         });
@@ -143,6 +128,15 @@ public class ConnectionForm extends JFrame {
         this.actionsPanel.setLayout(layout);
 
         this.add(this.actionsPanel, BorderLayout.PAGE_END);
+    }
+
+    private void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(
+                this,
+                message,
+                Strings.ERROR_TITLE,
+                JOptionPane.ERROR_MESSAGE
+        );
     }
 
     private static class FormLabel extends JLabel {
