@@ -2,7 +2,8 @@ package am.aua.sas.jirc.gui;
 
 public class JircGui {
     public JircGui() {
-        JircLoginForm loginForm = new JircLoginForm();
+        ConnectionForm loginForm = new ConnectionForm();
+        loginForm.pack();
         loginForm.setVisible(true);
     }
 }

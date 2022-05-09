@@ -18,7 +18,7 @@ public class Nick extends Command {
 	}
 
 	public Nick(String nick) {
-		this.cmd = IRC_COMMAND.NICK;
+		this.cmd = IrcCommand.NICK;
 		this.nick = nick;
 	}
 
