@@ -13,7 +13,7 @@ public class ConnectionForm extends JFrame {
     private final JPanel contentPanel = new JPanel();
     private final JPanel actionsPanel = new JPanel();
 
-    // TODO
+    // TODO: Read from disk
     private final Server[] servers = {
             new Server("irc.libera.chat", "6667"),
     };
@@ -26,10 +26,11 @@ public class ConnectionForm extends JFrame {
         JLabel serverListLabel = new FormLabel(Strings.SERVER_LABEL);
         JComboBox<Server> serverList = new JComboBox<>(this.servers);
         serverList.setEditable(true);
-        serverList.setSelectedIndex(0); // TODO
+        serverList.setSelectedIndex(0); // TODO: Select last used
         serverList.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // TODO: Save to disk
                 if (e.getActionCommand().equals("comboBoxEdited")) {
                     Object newItem = serverList.getSelectedItem();
                     if (newItem != null && !newItem.toString().trim().equals("")) {
@@ -41,7 +42,7 @@ public class ConnectionForm extends JFrame {
             }
         });
 
-        // TODO
+        // TODO: Abstract away
         final Insets labelInsets = new Insets(10, 0, 0, 4);
         final Insets fieldInsets = new Insets(10, 0, 0, 0);
 
@@ -83,7 +84,7 @@ public class ConnectionForm extends JFrame {
         continueButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                // TODO
+                // TODO: Add connection logic and switch windows
             }
         });
         this.actionsPanel.add(continueButton);
