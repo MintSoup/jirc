@@ -3,8 +3,10 @@
  */
 package am.aua.sas.jirc;
 
+import am.aua.sas.jirc.gui.JircGUI;
+
 public class Main {
 	public static void main(String[] args) {
-		System.out.println("hello world");
+		JircGUI gui = new JircGUI();
 	}
 }
