@@ -1,0 +1,13 @@
+plugins {
+    id 'application'
+}
+
+repositories {
+}
+
+dependencies {
+}
+
+application {
+    mainClass = 'am.aua.sas.jirc.Main'
+}
