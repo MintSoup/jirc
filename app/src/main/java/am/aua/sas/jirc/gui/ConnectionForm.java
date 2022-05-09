@@ -24,25 +24,27 @@ public class ConnectionForm extends JFrame {
         this.initActionsPanel();
 
         JLabel serverListLabel = new FormLabel(Strings.SERVER_LABEL);
-        JComboBox<Server> serverList = new JComboBox<>(this.servers);
-        serverList.setEditable(true);
-        serverList.setSelectedIndex(0); // TODO: Select last used
-        serverList.addActionListener(new ActionListener() {
+        JComboBox<Server> server = new JComboBox<>(this.servers);
+        server.setEditable(true);
+        server.setSelectedIndex(0); // TODO: Select last used
+        server.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO: Save to disk
                 if (e.getActionCommand().equals("comboBoxEdited")) {
-                    Object newItem = serverList.getSelectedItem();
+                    Object newItem = server.getSelectedItem();
                     if (newItem != null && !newItem.toString().trim().equals("")) {
                         Server newServer = new Server(newItem.toString(), "6667");
-                        serverList.addItem(newServer);
-                        serverList.setSelectedItem(newServer);
+                        server.addItem(newServer);
+                        server.setSelectedItem(newServer);
                     }
                 }
             }
         });
 
         // TODO: Abstract away
+        server.setPreferredSize(new Dimension(200, server.getPreferredSize().height));
+
         final Insets labelInsets = new Insets(10, 0, 0, 4);
         final Insets fieldInsets = new Insets(10, 0, 0, 0);
 
@@ -56,7 +58,7 @@ public class ConnectionForm extends JFrame {
         this.contentPanel.add(serverListLabel, c);
         c.gridx = 1;
         c.insets = fieldInsets;
-        this.contentPanel.add(serverList, c);
+        this.contentPanel.add(server, c);
 
         JLabel nicknameLabel = new FormLabel(Strings.NICKNAME_LABEL);
         JTextField nickname = new JTextField();

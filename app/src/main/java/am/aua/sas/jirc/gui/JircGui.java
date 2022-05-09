@@ -1,9 +1,15 @@
 package am.aua.sas.jirc.gui;
 
+import javax.swing.*;
+
 public class JircGui {
     public JircGui() {
         ConnectionForm loginForm = new ConnectionForm();
-        loginForm.pack();
-        loginForm.setVisible(true);
+        show(loginForm);
+    }
+
+    protected static void show(JFrame frame) {
+        frame.pack();
+        frame.setVisible(true);
     }
 }
