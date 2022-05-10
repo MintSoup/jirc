@@ -39,7 +39,7 @@ public class ConnectionsWindow extends JFrame {
 
         JComboBox<Server> serverField = new JComboBox<>(serversModel);
         serverField.setEditable(true);
-        serverField.setSelectedIndex(0); // TODO: Select last used
+        serverField.setSelectedIndex(0);
         serverField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
