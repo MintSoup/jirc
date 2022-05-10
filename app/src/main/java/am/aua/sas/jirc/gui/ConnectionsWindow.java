@@ -79,8 +79,8 @@ public class ConnectionsWindow extends JFrame {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 Server selectedServer = (Server) Objects.requireNonNull(serverField.getSelectedItem());
-                String username = usernameField.getText();
-                if (username.trim().equals("")) {
+                String username = usernameField.getText().trim();
+                if (username.length() == 0) {
                     showErrorMessage(Strings.BLANK_USERNAME_ERROR_MESSAGE);
                     return;
                 }
