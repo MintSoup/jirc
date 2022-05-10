@@ -47,7 +47,6 @@ public class MainWindow extends JFrame {
 
 		JPanel center = new JPanel(new GridBagLayout());
 		JTextPane chat = new JTextPane();
-		chat.setContentType("text/html");
 		chat.setEditable(false);
 		chat.setPreferredSize(new Dimension(600, 800));
 
@@ -126,11 +125,13 @@ public class MainWindow extends JFrame {
 		try {
 			StyledDocument doc = chat.getStyledDocument();
 			SimpleAttributeSet keyWord = new SimpleAttributeSet();
+			// StyleConstants.setBold(keyWord, true);
+			StyleConstants.setForeground(keyWord, new Color(0x51afef));
 			StyleConstants.setBold(keyWord, true);
-			StyleConstants.setForeground(keyWord, Color.BLUE);
-			doc.insertString(doc.getLength(), "[" + Message.DATE_FORMAT.format(m.getTimestamp()) + "]", keyWord);
-			StyleConstants.setForeground(keyWord, Color.ORANGE);
-			doc.insertString(doc.getLength(), "<" + m.getSender() + ">", keyWord);
+			doc.insertString(doc.getLength(), "[" + Message.DATE_FORMAT.format(m.getTimestamp()) + "] ", keyWord);
+			StyleConstants.setForeground(keyWord, new Color(0xc678dd));
+			doc.insertString(doc.getLength(), "<" + m.getSender() + "> ", keyWord);
+			StyleConstants.setBold(keyWord, false);
 			StyleConstants.setForeground(keyWord, Color.BLACK);
 			doc.insertString(doc.getLength(), m.getContent() + "\n", keyWord);
 		} catch (BadLocationException e) {
@@ -142,8 +143,7 @@ public class MainWindow extends JFrame {
 		try {
 			StyledDocument doc = chat.getStyledDocument();
 			SimpleAttributeSet keyWord = new SimpleAttributeSet();
-			StyleConstants.setBold(keyWord, true);
-			StyleConstants.setForeground(keyWord, Color.GRAY);
+			StyleConstants.setForeground(keyWord, Color.DARK_GRAY);
 			doc.insertString(doc.getLength(), raw, keyWord);
 		} catch (BadLocationException e) {
 			throw new RuntimeException(e);
