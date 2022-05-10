@@ -56,16 +56,13 @@ public class ConnectionsWindow extends JFrame {
                         newServer = new Server(IRCClient.DEFAULT_SERVER, IRCClient.DEFAULT_PORT);
                     } else if (parsedItem.length == 1) {
                         newServer = new Server(parsedItem[0], IRCClient.DEFAULT_PORT);
-                        if (repository.add(newServer)) {
-                            serversModel.addElement(newServer);
-                        }
                     } else {
                         newServer = new Server(parsedItem[0], Integer.parseInt(parsedItem[1]));
-                        if (repository.add(newServer)) {
-                            serversModel.addElement(newServer);
-                        }
                     }
 
+                    if (repository.add(newServer)) {
+                        serversModel.addElement(newServer);
+                    }
                     serversModel.setSelectedItem(newServer);
                 }
             }
