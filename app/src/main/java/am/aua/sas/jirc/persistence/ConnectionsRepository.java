@@ -46,7 +46,6 @@ public class ConnectionsRepository implements Repository<Server> {
 
     // It makes sense, in theory, for the Server class to be extended and possibly have mutable child classes.
     // Thus, it may be wise to make a manual deep copy of the ArrayList instead of simply calling clone() on it.
-    @Override
     public ArrayList<Server> getAll() {
         ArrayList<Server> deepClone = new ArrayList<>();
         for (Server element : this.servers) {
