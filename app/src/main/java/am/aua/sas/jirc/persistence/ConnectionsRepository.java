@@ -34,7 +34,7 @@ public class ConnectionsRepository {
         return instance;
     }
 
-    public ArrayList<Server> get() {
+    public ArrayList<Server> getAll() {
         ArrayList<Server> servers = new ArrayList<>();
         while (this.reader.hasNextLine()) {
             String url = this.reader.nextLine();
@@ -45,7 +45,7 @@ public class ConnectionsRepository {
         return servers;
     }
 
-    public void persist(Server server) {
+    public void add(Server server) {
         this.writer.println(server);
         this.writer.flush();
     }

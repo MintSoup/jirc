@@ -21,7 +21,7 @@ public class ConnectionsWindow extends JFrame {
 
     {
         serversModel.addElement(new Server(IRCClient.DEFAULT_SERVER, IRCClient.DEFAULT_PORT));
-        serversModel.addAll(ConnectionsRepository.getInstance().get());
+        serversModel.addAll(ConnectionsRepository.getInstance().getAll());
     }
 
     public ConnectionsWindow() {
@@ -51,11 +51,11 @@ public class ConnectionsWindow extends JFrame {
                     } else if (parsedItem.length == 1) {
                         newServer = new Server(parsedItem[0], IRCClient.DEFAULT_PORT);
                         // TODO: Check for duplicates
-                        ConnectionsRepository.getInstance().persist(newServer);
+                        ConnectionsRepository.getInstance().add(newServer);
                         serversModel.addElement(newServer);
                     } else {
                         newServer = new Server(parsedItem[0], Integer.parseInt(parsedItem[1]));
-                        ConnectionsRepository.getInstance().persist(newServer);
+                        ConnectionsRepository.getInstance().add(newServer);
                         serversModel.addElement(newServer);
                     }
                     serversModel.setSelectedItem(newServer);
