@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ConnectionsRepository implements AppendOnlyRepository<Server> {
-    public static final String CONNECTIONS = "connections.txt";
+    public static final String CONNECTIONS = "connections";
 
     private final ArrayList<Server> servers = new ArrayList<>();
 
@@ -56,11 +56,17 @@ public class ConnectionsRepository implements AppendOnlyRepository<Server> {
     }
 
     @Override
-    public void add(Server element) {
+    public boolean add(Server element) {
+        if (this.servers.contains(element)) {
+            return false;
+        }
+
         this.servers.add(element.clone());
 
         this.writer.println(element);
         this.writer.flush();
+
+        return true;
     }
 
     private void hydrate() {
