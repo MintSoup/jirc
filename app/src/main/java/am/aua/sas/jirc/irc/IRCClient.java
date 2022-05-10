@@ -76,7 +76,7 @@ public class IRCClient {
 		writeCommand(cmd);
 	}
 
-	public void listenForMessages(IMessageListener ml) throws IOException {
+	public void listenForMessages(MessageListener ml) throws IOException {
 		while (true) {
 			String line = readLine();
 			if (handlePing(line))

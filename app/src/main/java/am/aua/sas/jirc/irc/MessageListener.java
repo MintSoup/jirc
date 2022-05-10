@@ -1,5 +1,5 @@
 package am.aua.sas.jirc.irc;
 
-public interface IMessageListener {
+public interface MessageListener {
 	boolean handleMessage(String raw, Message m);
 }
