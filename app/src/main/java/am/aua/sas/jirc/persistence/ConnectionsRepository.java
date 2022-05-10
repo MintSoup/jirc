@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ConnectionsRepository implements Repository<Server> {
+public class ConnectionsRepository implements AppendOnlyRepository<Server> {
     public static final String CONNECTIONS = "connections.txt";
 
     private final ArrayList<Server> servers = new ArrayList<>();
@@ -61,18 +61,6 @@ public class ConnectionsRepository implements Repository<Server> {
 
         this.writer.println(element);
         this.writer.flush();
-    }
-
-    @Override
-    public void set(int index, Server element) {
-        this.servers.set(index, element.clone());
-        // TODO
-    }
-
-    @Override
-    public void remove(int index) {
-        this.servers.remove(index);
-        // TODO
     }
 
     private void hydrate() {
