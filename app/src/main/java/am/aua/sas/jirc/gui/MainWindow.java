@@ -15,12 +15,12 @@ import java.io.IOException;
 import java.util.Date;
 
 public class MainWindow extends JFrame {
-    private static GridBagConstraints gbc = new GridBagConstraints();
+    private final GridBagConstraints gbc = new GridBagConstraints();
 
-    private IRCClient client;
-    private Thread listenerThread;
+    private final IRCClient client;
+    private final Thread listenerThread;
 
-    private JTextPane chat;
+    private final JTextPane chat;
 
     private static final int INT_MESSAGE_COLOR = 0x98c379;
     private static final int SERVER_LINE_COLOR = 0x767676;
@@ -30,23 +30,10 @@ public class MainWindow extends JFrame {
 
     public MainWindow(IRCClient client) {
         this.client = client;
-        this.setTitle(Strings.APP_NAME);
-        // this.setResizable(false);
-        this.setLocationRelativeTo(null);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLayout(new BorderLayout(5, 5));
 
-        JMenuBar menu = new JMenuBar();
+        this.initFrame();
 
-        JMenu jirc = new JMenu(Strings.FILE_MENU_LABEL);
-
-        JMenuItem about = new JMenuItem(Strings.ABOUT_WINDOW_TITLE);
-        about.addActionListener((e) -> new AboutWindow());
-        jirc.add(about);
-
-        menu.add(jirc);
-        // menu.add(new JMenu("View"));
-        this.setJMenuBar(menu);
+        this.setUpMenuBar();
 
         String[] buttons = new String[]{"Dummy1", "Dummy2", "Dummy3"};
         JList<String> channels = new JList<>(buttons);
@@ -107,6 +94,37 @@ public class MainWindow extends JFrame {
             }
         }, "Message Receiver");
         listenerThread.start();
+    }
+
+    private void initFrame() {
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.setLocationRelativeTo(null);
+
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setTitle(Strings.APP_NAME);
+
+        LayoutManager layout = new BorderLayout(5, 5);
+        this.setLayout(layout);
+    }
+
+    private void setUpMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+
+        JMenu fileMenu = new JMenu(Strings.FILE_MENU_LABEL);
+        JMenuItem about = new JMenuItem(Strings.ABOUT_WINDOW_TITLE);
+        about.addActionListener((e) -> new AboutWindow());
+        fileMenu.add(about);
+        menuBar.add(fileMenu);
+
+        JMenu exportMenu = new JMenu(Strings.EXPORT_MENU_LABEL);
+        JMenuItem exportCurrent = new JMenuItem(Strings.EXPORT_CURRENT_MENU_ITEM_LABEL);
+        exportCurrent.addActionListener((e) -> {
+            // TODO
+        });
+        exportMenu.add(exportCurrent);
+        menuBar.add(exportMenu);
+
+        this.setJMenuBar(menuBar);
     }
 
     private void append(String message, int color, boolean bold) {

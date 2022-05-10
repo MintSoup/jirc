@@ -4,6 +4,9 @@ public final class Strings {
     public static final String APP_NAME = "Jirc";
 
     public static final String FILE_MENU_LABEL = "File";
+    public static final String EXPORT_MENU_LABEL = "Export";
+    public static final String EXPORT_CURRENT_MENU_ITEM_LABEL = "Export current chat...";
+
     public static final String ABOUT_WINDOW_TITLE = "About";
     public static final String ABOUT_WINDOW_BUTTON_OKAY = "Okay";
 
