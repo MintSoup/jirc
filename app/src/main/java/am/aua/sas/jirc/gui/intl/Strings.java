@@ -1,11 +1,14 @@
 package am.aua.sas.jirc.gui.intl;
 
 public final class Strings {
-    public static final String FILE_MENU_LABEL = "File";
-    public static final String ABOUT_MENU_ITEM_LABEL = "About";
+    public static final String APP_NAME = "Jirc";
 
-    public static final String CONNECTION_FORM_TITLE = "Connect to a server";
-    public static final String CONNECTION_FORM_BUTTON_OKAY = "Connect";
+    public static final String FILE_MENU_LABEL = "File";
+    public static final String ABOUT_WINDOW_TITLE = "About";
+    public static final String ABOUT_WINDOW_BUTTON_OKAY = "Okay";
+
+    public static final String CONNECTIONS_WINDOW_TITLE = "Connect to a server";
+    public static final String CONNECTIONS_WINDOW_BUTTON_OKAY = "Connect";
     public static final String CONNECTION_ERROR_MESSAGE = "Connection rejected.";
     public static final String DUPLICATE_USERNAME_ERROR_MESSAGE = "Username already exists.";
     public static final String BLANK_USERNAME_ERROR_MESSAGE = "Username cannot be blank.";

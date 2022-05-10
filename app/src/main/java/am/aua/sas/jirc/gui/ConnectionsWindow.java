@@ -13,15 +13,19 @@ import java.util.Objects;
 
 public class ConnectionsWindow extends JFrame {
     private static final Dimension SIZE = new Dimension(400, 200);
+    private static final Insets LABEL_INSETS = new Insets(10, 0, 0, 4);
+    private static final Insets FIELD_INSETS = new Insets(10, 0, 0, 0);
 
     private final JPanel contentPanel = new JPanel();
     private final JPanel actionsPanel = new JPanel();
 
+    private final GridBagConstraints constraints;
+
+    private final ConnectionsRepository repository = ConnectionsRepository.getInstance();
     private final DefaultComboBoxModel<Server> serversModel = new DefaultComboBoxModel<>();
 
     {
-        serversModel.addElement(new Server(IRCClient.DEFAULT_SERVER, IRCClient.DEFAULT_PORT));
-        serversModel.addAll(ConnectionsRepository.getInstance().getAll());
+        serversModel.addAll(repository.getAll());
     }
 
     public ConnectionsWindow() {
@@ -29,14 +33,16 @@ public class ConnectionsWindow extends JFrame {
         this.initContentPanel();
         this.initActionsPanel();
 
-        JLabel serverListLabel = new FormLabel(Strings.SERVER_LABEL);
+        this.constraints = new GridBagConstraints();
+        this.constraints.fill = GridBagConstraints.HORIZONTAL;
+        this.constraints.ipady = 8;
+
         JComboBox<Server> serverField = new JComboBox<>(serversModel);
         serverField.setEditable(true);
         serverField.setSelectedIndex(0); // TODO: Select last used
         serverField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO: Save to disk
                 if (e.getActionCommand().equals("comboBoxEdited")) {
                     Object selectedItem = serversModel.getSelectedItem();
                     if (selectedItem == null) {
@@ -51,60 +57,38 @@ public class ConnectionsWindow extends JFrame {
                     } else if (parsedItem.length == 1) {
                         newServer = new Server(parsedItem[0], IRCClient.DEFAULT_PORT);
                         // TODO: Check for duplicates
-                        ConnectionsRepository.getInstance().add(newServer);
+                        repository.add(newServer);
                         serversModel.addElement(newServer);
                     } else {
                         newServer = new Server(parsedItem[0], Integer.parseInt(parsedItem[1]));
-                        ConnectionsRepository.getInstance().add(newServer);
+                        repository.add(newServer);
                         serversModel.addElement(newServer);
                     }
+
                     serversModel.setSelectedItem(newServer);
                 }
             }
         });
+        this.addField(Strings.SERVER_LABEL, serverField);
 
-        // TODO: Abstract away
-        serverField.setPreferredSize(new Dimension(200, serverField.getPreferredSize().height));
-
-        final Insets labelInsets = new Insets(10, 0, 0, 4);
-        final Insets fieldInsets = new Insets(10, 0, 0, 0);
-
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.ipady = 8;
-
-        c.gridy = 0;
-        c.gridx = 0;
-        c.insets = labelInsets;
-        this.contentPanel.add(serverListLabel, c);
-        c.gridx = 1;
-        c.insets = fieldInsets;
-        this.contentPanel.add(serverField, c);
-
-        JLabel usernameLabel = new FormLabel(Strings.USERNAME_LABEL);
         JTextField usernameField = new JTextField();
+        this.addField(Strings.USERNAME_LABEL, usernameField);
 
-        c.gridy++;
-        c.gridx = 0;
-        c.insets = labelInsets;
-        this.contentPanel.add(usernameLabel, c);
-        c.gridx = 1;
-        c.insets = fieldInsets;
-        this.contentPanel.add(usernameField, c);
-
-        JButton continueButton = new JButton(Strings.CONNECTION_FORM_BUTTON_OKAY);
+        JButton continueButton = new JButton(Strings.CONNECTIONS_WINDOW_BUTTON_OKAY);
         continueButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 Server selectedServer = (Server) Objects.requireNonNull(serverField.getSelectedItem());
-                // TODO: Try to split into hostname and port, otherwise use default port
                 String username = usernameField.getText();
                 if (username.trim().equals("")) {
                     showErrorMessage(Strings.BLANK_USERNAME_ERROR_MESSAGE);
                     return;
                 }
+
+                IRCClient client = new IRCClient(selectedServer.getHostname(), selectedServer.getPort(), username);
+
                 JircGui.hide(ConnectionsWindow.this);
-                JircGui.show(new MainWindow(new IRCClient(IRCClient.DEFAULT_SERVER, IRCClient.DEFAULT_PORT, username)));
+                JircGui.show(new MainWindow(client));
             }
         });
         this.actionsPanel.add(continueButton);
@@ -116,7 +100,7 @@ public class ConnectionsWindow extends JFrame {
         this.setLocationRelativeTo(null);
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setTitle(Strings.CONNECTION_FORM_TITLE);
+        this.setTitle(Strings.CONNECTIONS_WINDOW_TITLE);
 
         LayoutManager layout = new BorderLayout();
         this.setLayout(layout);
@@ -134,6 +118,18 @@ public class ConnectionsWindow extends JFrame {
         this.actionsPanel.setLayout(layout);
 
         this.add(this.actionsPanel, BorderLayout.PAGE_END);
+    }
+
+    private void addField(String label, Component field) {
+        constraints.gridy++;
+        constraints.gridx = 0;
+        constraints.insets = LABEL_INSETS;
+        this.contentPanel.add(new FormLabel(label), constraints);
+
+        constraints.gridx = 1;
+        constraints.insets = FIELD_INSETS;
+        field.setPreferredSize(new Dimension(200, field.getPreferredSize().height));
+        this.contentPanel.add(field, constraints);
     }
 
     private void showErrorMessage(String message) {

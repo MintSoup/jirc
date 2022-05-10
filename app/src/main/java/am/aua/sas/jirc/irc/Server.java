@@ -4,7 +4,7 @@ import am.aua.sas.jirc.irc.exceptions.InvalidUrlException;
 
 import java.io.Serializable;
 
-public class Server implements Serializable {
+public class Server implements Cloneable, Serializable {
     private final String hostname;
     private final int port;
 
@@ -80,5 +80,14 @@ public class Server implements Serializable {
         }
 
         return port;
+    }
+
+    @Override
+    public Server clone() {
+        try {
+            return (Server) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }
