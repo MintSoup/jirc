@@ -85,7 +85,7 @@ public class ConnectionsWindow extends JFrame {
                     return;
                 }
 
-                IRCClient client = new IRCClient(selectedServer.getHostname(), selectedServer.getPort(), username);
+                IRCClient client = new IRCClient(selectedServer, username);
 
                 JircGui.hide(ConnectionsWindow.this);
                 JircGui.show(new MainWindow(client));

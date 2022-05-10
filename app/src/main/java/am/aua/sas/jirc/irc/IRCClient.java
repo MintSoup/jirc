@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 public class IRCClient {
-    private final String server;
+    private final String hostname;
     private final int port;
     private String nick;
 
@@ -37,8 +37,12 @@ public class IRCClient {
         this(DEFAULT_SERVER, DEFAULT_PORT, DEFAULT_USERNAME);
     }
 
-    public IRCClient(String serverIp, int port, String username) {
-        this.server = serverIp;
+    public IRCClient(Server server, String username) {
+        this(server.getHostname(), server.getPort(), username);
+    }
+
+    public IRCClient(String hostname, int port, String username) {
+        this.hostname = hostname;
         this.port = port;
         this.nick = username;
         this.channels = new ArrayList<>();
@@ -46,7 +50,7 @@ public class IRCClient {
     }
 
     public void open() throws UnknownHostException, IOException, IRCException {
-        socket = new Socket(server, port);
+        socket = new Socket(hostname, port);
         socket.setSoTimeout(0);
 
         out = new PrintWriter(socket.getOutputStream());
@@ -189,16 +193,16 @@ public class IRCClient {
         socket.close();
     }
 
-    public String getServer() {
-        return server;
-    }
-
-    public String getNickname() {
-        return nick;
+    public String getHostname() {
+        return hostname;
     }
 
     public int getPort() {
         return port;
+    }
+
+    public String getNickname() {
+        return nick;
     }
 
     public List<String> getLog() {
