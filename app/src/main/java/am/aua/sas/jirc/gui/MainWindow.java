@@ -26,8 +26,8 @@ public class MainWindow extends JFrame {
 	private static final int DATE_COLOR = 0x51afef;
 	private static final int MY_NICKNAME_COLOR = 0xc678dd;
 	private static final int NICKNAME_COLOR = 0xd19a66;
-	public MainWindow() {
-		this.setSize(1080, 1080);
+	public MainWindow(IRCClient client) {
+        this.client = client;
 		this.setTitle("Jirc");
 		// this.setResizable(false);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -55,7 +55,7 @@ public class MainWindow extends JFrame {
 		JPanel center = new JPanel(new GridBagLayout());
 		chat = new JTextPane();
 		chat.setEditable(false);
-		chat.setPreferredSize(new Dimension(600, 800));
+		chat.setPreferredSize(new Dimension(800, 800));
 
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -87,7 +87,6 @@ public class MainWindow extends JFrame {
 
 		listenerThread = new Thread(() -> {
 			try {
-				client = new IRCClient();
 				client.open();
 				client.join("#test");
 				appendInternalMessage("Joined #test\n");

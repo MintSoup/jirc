@@ -87,7 +87,7 @@ public class ConnectionForm extends JFrame {
 					return;
 				}
 				JircGui.hide(ConnectionForm.this);
-				JircGui.show(new MainWindow());
+				JircGui.show(new MainWindow(new IRCClient(IRCClient.DEFAULT_SERVER, IRCClient.DEFAULT_PORT, username)));
 			}
 		});
 		this.actionsPanel.add(continueButton);
