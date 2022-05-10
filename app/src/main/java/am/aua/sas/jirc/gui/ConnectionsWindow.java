@@ -95,8 +95,9 @@ public class ConnectionsWindow extends JFrame {
     }
 
     private void initFrame() {
-        this.setMinimumSize(SIZE);
         this.setSize(SIZE);
+        this.setMinimumSize(SIZE);
+        this.setPreferredSize(SIZE);
         this.setLocationRelativeTo(null);
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

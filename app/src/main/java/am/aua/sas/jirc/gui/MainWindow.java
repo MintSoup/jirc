@@ -11,11 +11,13 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Date;
 
 public class MainWindow extends JFrame {
-    private final GridBagConstraints gbc = new GridBagConstraints();
+    private final GridBagConstraints constraints = new GridBagConstraints();
 
     private final IRCClient client;
     private final Thread listenerThread;
@@ -47,50 +49,56 @@ public class MainWindow extends JFrame {
         chat.setEditable(false);
         chat.setPreferredSize(new Dimension(800, 800));
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 1;
-        gbc.weighty = 1;
-        gbc.fill = GridBagConstraints.BOTH;
-        center.add(chat, gbc);
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.weightx = 1;
+        constraints.weighty = 1;
+        constraints.fill = GridBagConstraints.BOTH;
+        center.add(chat, constraints);
 
         JTextField message = new JTextField();
         // add placeholder here
-        message.addActionListener((e) -> {
-            try {
-                client.sendMessage("#test", message.getText());
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
+        message.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    client.sendMessage("#test", message.getText());
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                Message m = new Message(client.getNickname(), "#test", message.getText(), new Date());
+                MainWindow.this.appendMine(m);
+                message.setText("");
             }
-            Message m = new Message(client.getNickname(), "#test", message.getText(), new Date());
-            appendMine(m);
-            message.setText("");
         });
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weightx = 1;
-        gbc.weighty = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        center.add(message, gbc);
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.weightx = 1;
+        constraints.weighty = 0;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        center.add(message, constraints);
 
         this.add(center, BorderLayout.CENTER);
 
-        listenerThread = new Thread(() -> {
-            try {
-                client.open();
-                client.join("#test");
-                appendInternalMessage("Joined #test\n");
-                client.listenForMessages((r, m) -> {
-                    if (m != null)
-                        append(m);
-                    else
-                        appendServerLine(r + "\n");
-                    return false;
-                });
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (IRCException e1) {
-                e1.printStackTrace();
+        listenerThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    client.open();
+                    client.join("#test");
+                    MainWindow.this.appendInternalMessage("Joined #test\n");
+                    client.listenForMessages((r, m) -> {
+                        if (m != null)
+                            MainWindow.this.append(m);
+                        else
+                            MainWindow.this.appendServerLine(r + "\n");
+                        return false;
+                    });
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (IRCException e1) {
+                    e1.printStackTrace();
+                }
             }
         }, "Message Receiver");
         listenerThread.start();
@@ -112,14 +120,22 @@ public class MainWindow extends JFrame {
 
         JMenu fileMenu = new JMenu(Strings.FILE_MENU_LABEL);
         JMenuItem about = new JMenuItem(Strings.ABOUT_WINDOW_TITLE);
-        about.addActionListener((e) -> new AboutWindow());
+        about.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JircGui.show(new AboutWindow());
+            }
+        });
         fileMenu.add(about);
         menuBar.add(fileMenu);
 
         JMenu exportMenu = new JMenu(Strings.EXPORT_MENU_LABEL);
         JMenuItem exportCurrent = new JMenuItem(Strings.EXPORT_CURRENT_MENU_ITEM_LABEL);
-        exportCurrent.addActionListener((e) -> {
-            // TODO
+        exportCurrent.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // TODO
+            }
         });
         exportMenu.add(exportCurrent);
         menuBar.add(exportMenu);
