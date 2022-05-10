@@ -1,7 +1,8 @@
 package am.aua.sas.jirc.gui;
 
+import am.aua.sas.jirc.gui.intl.Strings;
 import am.aua.sas.jirc.irc.IRCClient;
-import am.aua.sas.jirc.irc.IRCException;
+import am.aua.sas.jirc.irc.exceptions.IRCException;
 import am.aua.sas.jirc.irc.Message;
 
 import javax.swing.*;

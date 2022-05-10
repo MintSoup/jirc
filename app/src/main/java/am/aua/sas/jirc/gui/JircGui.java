@@ -4,7 +4,7 @@ import javax.swing.*;
 
 public class JircGui {
     public JircGui() {
-        ConnectionForm loginForm = new ConnectionForm();
+        ConnectionsWindow loginForm = new ConnectionsWindow();
         show(loginForm);
     }
 

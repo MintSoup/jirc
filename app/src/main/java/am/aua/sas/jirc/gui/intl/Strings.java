@@ -1,4 +1,4 @@
-package am.aua.sas.jirc.gui;
+package am.aua.sas.jirc.gui.intl;
 
 public final class Strings {
     public static final String FILE_MENU_LABEL = "File";

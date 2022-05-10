@@ -1,5 +1,10 @@
 package am.aua.sas.jirc.irc;
 
+import am.aua.sas.jirc.irc.commands.*;
+import am.aua.sas.jirc.irc.exceptions.IRCException;
+import am.aua.sas.jirc.irc.exceptions.NicknameAlreadyInUseException;
+import am.aua.sas.jirc.irc.exceptions.NoSuchChannelException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,14 +14,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import am.aua.sas.jirc.irc.commands.Command;
-import am.aua.sas.jirc.irc.commands.Join;
-import am.aua.sas.jirc.irc.commands.Nick;
-import am.aua.sas.jirc.irc.commands.Pong;
-import am.aua.sas.jirc.irc.commands.PrivMsg;
-import am.aua.sas.jirc.irc.commands.Quit;
-import am.aua.sas.jirc.irc.commands.User;
 
 public class IRCClient {
 
