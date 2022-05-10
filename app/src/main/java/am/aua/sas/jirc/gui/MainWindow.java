@@ -19,6 +19,13 @@ public class MainWindow extends JFrame {
 	private IRCClient client;
 	private Thread listenerThread;
 
+	private JTextPane chat;
+
+	private static final int INT_MESSAGE_COLOR = 0x98c379;
+	private static final int SERVER_LINE_COLOR = 0x767676;
+	private static final int DATE_COLOR = 0x51afef;
+	private static final int MY_NICKNAME_COLOR = 0xc678dd;
+	private static final int NICKNAME_COLOR = 0xd19a66;
 	public MainWindow() {
 		this.setSize(1080, 1080);
 		this.setTitle("Jirc");
@@ -46,7 +53,7 @@ public class MainWindow extends JFrame {
 		this.add(channels, BorderLayout.WEST);
 
 		JPanel center = new JPanel(new GridBagLayout());
-		JTextPane chat = new JTextPane();
+		chat = new JTextPane();
 		chat.setEditable(false);
 		chat.setPreferredSize(new Dimension(600, 800));
 
@@ -66,7 +73,7 @@ public class MainWindow extends JFrame {
 				throw new RuntimeException(ex);
 			}
 			Message m = new Message(client.getNickname(), "#test", message.getText(), new Date());
-			append(chat, m);
+			appendMine(m);
 			message.setText("");
 		});
 		gbc.gridx = 0;
@@ -76,33 +83,19 @@ public class MainWindow extends JFrame {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		center.add(message, gbc);
 
-		/*
-		 * JButton send = new JButton("Send"); send.addActionListener((e) -> {
-		 * showMessage(chat, new String[]{"09.05.2022", "Suren2003ah",
-		 * message.getText()}); message.setText(""); });
-		 */
-		// messageBox.add(send);
 		this.add(center, BorderLayout.CENTER);
-
-		/*
-		 * String[] arr = new String[]{"Suren2003ah", "MintSoup", "Anton LaVel"};
-		 * JList<String> status = new JList<>(arr); status.setPreferredSize(new
-		 * Dimension(200, chat.getPreferredSize().height));
-		 * status.setBackground(Color.GRAY);
-		 *
-		 * this.add(status, BorderLayout.EAST);
-		 */
 
 		listenerThread = new Thread(() -> {
 			try {
 				client = new IRCClient();
 				client.open();
 				client.join("#test");
+				appendInternalMessage("Joined #test\n");
 				client.listenForMessages((r, m) -> {
 					if (m != null)
-						append(chat, m);
+						append(m);
 					else
-						append(chat, r + "\n");
+						appendServerLine(r + "\n");
 					return false;
 				});
 			} catch (IOException e) {
@@ -114,46 +107,37 @@ public class MainWindow extends JFrame {
 		listenerThread.start();
 	}
 
-	private void channelsPrinter(JPanel panel, String[] names) {
-		for (int i = 0; i < names.length; i++) {
-			JButton temp = new JButton(names[i]);
-			panel.add(temp);
-		}
-	}
-
-	private void append(JTextPane chat, Message m) {
+	private void append(String message, int color, boolean bold) {
+		StyledDocument doc = chat.getStyledDocument();
+		SimpleAttributeSet keyWord = new SimpleAttributeSet();
+		StyleConstants.setFontSize(keyWord, 16);
+		StyleConstants.setBold(keyWord, bold);
+		StyleConstants.setForeground(keyWord, new Color(color));
 		try {
-			StyledDocument doc = chat.getStyledDocument();
-			SimpleAttributeSet keyWord = new SimpleAttributeSet();
-			// StyleConstants.setBold(keyWord, true);
-			StyleConstants.setForeground(keyWord, new Color(0x51afef));
-			StyleConstants.setBold(keyWord, true);
-			doc.insertString(doc.getLength(), "[" + Message.DATE_FORMAT.format(m.getTimestamp()) + "] ", keyWord);
-			StyleConstants.setForeground(keyWord, new Color(0xc678dd));
-			doc.insertString(doc.getLength(), "<" + m.getSender() + "> ", keyWord);
-			StyleConstants.setBold(keyWord, false);
-			StyleConstants.setForeground(keyWord, Color.BLACK);
-			doc.insertString(doc.getLength(), m.getContent() + "\n", keyWord);
+			doc.insertString(doc.getLength(), message, keyWord);
 		} catch (BadLocationException e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
 		}
 	}
 
-	private void append(JTextPane chat, String raw) {
-		try {
-			StyledDocument doc = chat.getStyledDocument();
-			SimpleAttributeSet keyWord = new SimpleAttributeSet();
-			StyleConstants.setForeground(keyWord, Color.DARK_GRAY);
-			doc.insertString(doc.getLength(), raw, keyWord);
-		} catch (BadLocationException e) {
-			throw new RuntimeException(e);
-		}
+	private void append(Message m) {
+		append("[" + Message.DATE_FORMAT.format(m.getTimestamp()) + "] ", DATE_COLOR, true);
+		append("<" + m.getSender() + "> ", NICKNAME_COLOR, true);
+		append(m.getContent() + "\n", 0, false);
 	}
 
-	private void peoplePrinter(JPanel panel, String[] people) {
-		for (int i = 0; i < people.length; i++) {
-			JLabel temp = new JLabel("<html> " + people[i] + " <br><br> </html>");
-			panel.add(temp);
-		}
+	private void appendMine(Message m) {
+		append("[" + Message.DATE_FORMAT.format(m.getTimestamp()) + "] ", DATE_COLOR, true);
+		append("<" + m.getSender() + "> ", MY_NICKNAME_COLOR, true);
+		append(m.getContent() + "\n", 0, false);
 	}
+
+	private void appendServerLine(String line) {
+		append(line, SERVER_LINE_COLOR, false);
+	}
+
+	private void appendInternalMessage(String line) {
+		append(line, INT_MESSAGE_COLOR, true);
+	}
+
 }
