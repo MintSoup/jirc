@@ -157,6 +157,8 @@ public class MainWindow extends JFrame {
         } catch (IOException e) {
             JircGui.showErrorMessage(this, Strings.COULD_NOT_EXPORT_ERROR_MESSAGE);
         }
+
+        JircGui.showSuccessMessage(this, Strings.SUCCESSFULLY_EXPORTED_MESSAGE);
     }
 
     private static class Channel {

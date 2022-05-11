@@ -21,6 +21,10 @@ public class JircGui {
         frame.dispose();
     }
 
+    protected static void showSuccessMessage(Component context, String message) {
+        JOptionPane.showMessageDialog(context, message, Strings.SUCCESS_TITLE, JOptionPane.PLAIN_MESSAGE);
+    }
+
     protected static void showErrorMessage(Component context, String message) {
         JOptionPane.showMessageDialog(context, message, Strings.ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
     }
