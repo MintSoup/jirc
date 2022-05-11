@@ -45,6 +45,8 @@ public class MainWindow extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int i = channelList.locationToIndex(e.getPoint());
+                if (i == -1)
+                    return;
                 String s = model.getElementAt(i);
                 currentChannel = s;
                 ((CardLayout) center.getLayout()).show(center, s);
@@ -159,6 +161,8 @@ public class MainWindow extends JFrame {
         } catch (IOException e) {
             JircGui.showErrorMessage(this, Strings.COULD_NOT_EXPORT_ERROR_MESSAGE);
         }
+
+        JircGui.showSuccessMessage(this, Strings.SUCCESSFULLY_EXPORTED_MESSAGE);
     }
 
     private static class Channel {

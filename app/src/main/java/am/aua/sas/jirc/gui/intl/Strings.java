@@ -21,6 +21,9 @@ public final class Strings {
 
     public static final String COULD_NOT_EXPORT_ERROR_MESSAGE = "Could not export chat.";
 
+    public static final String SUCCESSFULLY_EXPORTED_MESSAGE = "Chat successfully exported!";
+
+    public static final String SUCCESS_TITLE = "Success";
     public static final String ERROR_TITLE = "Error";
 
     public static final String SERVER_LABEL = "Server";
