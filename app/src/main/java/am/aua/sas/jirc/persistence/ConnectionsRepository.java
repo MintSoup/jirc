@@ -1,9 +1,13 @@
 package am.aua.sas.jirc.persistence;
 
+import am.aua.sas.jirc.gui.intl.Strings;
 import am.aua.sas.jirc.irc.IRCClient;
 import am.aua.sas.jirc.irc.Server;
 
+import javax.swing.filechooser.FileSystemView;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -26,8 +30,12 @@ public class ConnectionsRepository implements AppendOnlyRepository<Server> {
     }
 
     private ConnectionsRepository(String source) throws IOException {
-        // TODO: Create in ~/.Jirc/
-        File sourceFile = new File(source);
+        Path sourcePath = Path.of(
+                FileSystemView.getFileSystemView().getDefaultDirectory().getPath(),
+                "." + Strings.APP_NAME,
+                source);
+        Files.createDirectories(sourcePath.getParent());
+        File sourceFile = sourcePath.toFile();
         sourceFile.createNewFile();
 
         this.reader = new Scanner(new FileInputStream(sourceFile));

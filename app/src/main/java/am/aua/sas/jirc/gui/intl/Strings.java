@@ -19,6 +19,8 @@ public final class Strings {
     public static final String BLANK_USERNAME_ERROR_MESSAGE = "Username cannot be blank.";
     public static final String EMPTY_CHANNELS_ERROR_MESSAGE = "Enter at least one valid channel name.";
 
+    public static final String COULD_NOT_EXPORT_ERROR_MESSAGE = "Could not export chat.";
+
     public static final String ERROR_TITLE = "Error";
 
     public static final String SERVER_LABEL = "Server";

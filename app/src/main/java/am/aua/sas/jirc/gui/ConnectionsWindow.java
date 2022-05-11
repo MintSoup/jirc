@@ -106,15 +106,16 @@ public class ConnectionsWindow extends JFrame {
         this.setMinimumSize(SIZE);
         this.setPreferredSize(SIZE);
         this.setLocationRelativeTo(null);
-        File file = new File("app/src/main/java/am/aua/sas/jirc/gui/jirc.png");
-        BufferedImage image;
+
         try {
-            image = ImageIO.read(file);
+            File file = new File(getClass().getResource("/jirc.png").getFile());
+            BufferedImage image = ImageIO.read(file);
             this.setIconImage(image);
-            final Taskbar taskbar = Taskbar.getTaskbar();
-            taskbar.setIconImage(image);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            if (Taskbar.isTaskbarSupported()) {
+                final Taskbar taskbar = Taskbar.getTaskbar();
+                taskbar.setIconImage(image);
+            }
+        } catch (IOException ignored) {
         }
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

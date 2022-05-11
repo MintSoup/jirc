@@ -4,15 +4,18 @@ import am.aua.sas.jirc.gui.intl.Strings;
 import am.aua.sas.jirc.irc.IRCClient;
 import am.aua.sas.jirc.irc.Message;
 import am.aua.sas.jirc.irc.exceptions.IRCException;
-import am.aua.sas.jirc.irc.exceptions.NicknameAlreadyInUseException;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -99,17 +102,17 @@ public class MainWindow extends JFrame {
     private void initFrame() {
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setLocationRelativeTo(null);
-        File file = new File("app/src/main/java/am/aua/sas/jirc/gui/jirc.png");
-        BufferedImage image = null;
-        try {
-            image = ImageIO.read(file);
-            this.setIconImage(image);
-            final Taskbar taskbar = Taskbar.getTaskbar();
-            taskbar.setIconImage(image);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
+        try {
+            File file = new File(getClass().getResource("/jirc.png").getFile());
+            BufferedImage image = ImageIO.read(file);
+            this.setIconImage(image);
+            if (Taskbar.isTaskbarSupported()) {
+                final Taskbar taskbar = Taskbar.getTaskbar();
+                taskbar.setIconImage(image);
+            }
+        } catch (IOException ignored) {
+        }
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle(Strings.APP_NAME);
@@ -137,17 +140,23 @@ public class MainWindow extends JFrame {
     }
 
     private void save() {
-        PrintWriter writer;
         try {
-            // TODO: Save to Documents/Jirc/<current_date.txt>
-            writer = new PrintWriter(new FileOutputStream("database"));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            Path path = Path.of(
+                    FileSystemView.getFileSystemView().getDefaultDirectory().getPath(),
+                    Strings.APP_NAME,
+                    Date.from(Instant.now()) + ".txt");
+            Files.createDirectories(path.getParent());
+            File file = path.toFile();
+            file.createNewFile();
+
+            PrintWriter writer = new PrintWriter(new FileOutputStream(file));
+            String content = channels.get(currentChannel).getChat().getText();
+            writer.println(content);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            JircGui.showErrorMessage(this, Strings.COULD_NOT_EXPORT_ERROR_MESSAGE);
         }
-        String content = channels.get(currentChannel).getChat().getText();
-        writer.println(content);
-        writer.flush();
-        writer.close();
     }
 
     private static class Channel {
