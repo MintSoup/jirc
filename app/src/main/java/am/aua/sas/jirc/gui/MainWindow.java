@@ -38,7 +38,7 @@ public class MainWindow extends JFrame {
 
         DefaultListModel<String> model = new DefaultListModel<>();
         JList<String> channelList = new JList<>(model);
-        channelList.setBackground(Color.GRAY);
+        channelList.setBackground(new Color(0x98c379));
         channelList.setPreferredSize(new Dimension(100, 640));
         channelList.addMouseListener(new MouseListener() {
             @Override
