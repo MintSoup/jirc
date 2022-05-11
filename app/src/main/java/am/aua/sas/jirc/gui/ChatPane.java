@@ -27,6 +27,7 @@ public class ChatPane extends JTextPane {
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
+		setCaretPosition(doc.getLength());
     }
 
     public void append(Message m) {
