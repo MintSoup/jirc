@@ -7,8 +7,6 @@ import am.aua.sas.jirc.irc.exceptions.IRCException;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ContainerAdapter;
-import java.awt.event.ContainerEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.FileNotFoundException;
@@ -21,7 +19,7 @@ import java.util.HashMap;
 public class MainWindow extends JFrame {
     private final IRCClient client;
     private final Thread listenerThread;
-    private HashMap<String, Channel> channels;
+    private final HashMap<String, Channel> channels;
     private String currentChannel;
 
     public MainWindow(IRCClient client, String... autoJoin) {
@@ -70,31 +68,30 @@ public class MainWindow extends JFrame {
         this.add(center, BorderLayout.CENTER);
 
         listenerThread = new Thread(() -> {
-                try {
-                    this.setTitle("Loading...");
-                    client.open();
-                    for (int i = 0; i < autoJoin.length; i++) {
-                        client.join(autoJoin[i]);
-                        model.addElement(autoJoin[i]);
-                        Channel c = Channel.generateCenterBox(autoJoin[i], client);
-                        channels.put(autoJoin[i], c);
-                        center.add(c.getPanel(), autoJoin[i]);
-                    }
-                    this.setTitle("Jirc");
-                    //appendInternalMessage("Joined #test\n");
-                    client.listenForMessages((r, m) -> {
-                        if (m != null) {
-                            Channel c = channels.get(m.getChannel());
-                            c.getChat().append(m);
-                        } else
-                            channels.get(currentChannel).getChat().appendServerLine(r);
-                        return false;
-                    });
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } catch (IRCException e1) {
-                    e1.printStackTrace();
+            try {
+                this.setTitle(Strings.LOADING);
+                client.open();
+                for (int i = 0; i < autoJoin.length; i++) {
+                    client.join(autoJoin[i]);
+                    model.addElement(autoJoin[i]);
+                    Channel c = Channel.generateCenterBox(autoJoin[i], client);
+                    channels.put(autoJoin[i], c);
+                    center.add(c.getPanel(), autoJoin[i]);
                 }
+                this.setTitle(Strings.APP_NAME);
+                //appendInternalMessage("Joined #test\n");
+                client.listenForMessages((r, m) -> {
+                    if (m != null) {
+                        Channel c = channels.get(m.getChannel());
+                        c.getChat().append(m);
+                    } else channels.get(currentChannel).getChat().appendServerLine(r);
+                    return false;
+                });
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (IRCException e1) {
+                e1.printStackTrace();
+            }
         }, "Message Receiver");
         listenerThread.start();
     }
@@ -121,7 +118,7 @@ public class MainWindow extends JFrame {
 
         JMenu exportMenu = new JMenu(Strings.EXPORT_MENU_LABEL);
         JMenuItem exportCurrent = new JMenuItem(Strings.EXPORT_CURRENT_MENU_ITEM_LABEL);
-        //exportCurrent.addActionListener((e) -> save());
+        exportCurrent.addActionListener((e) -> save());
         exportMenu.add(exportCurrent);
         menuBar.add(exportMenu);
 
@@ -129,23 +126,24 @@ public class MainWindow extends JFrame {
     }
 
     private void save() {
-        PrintWriter writer = null;
+        PrintWriter writer;
         try {
-            writer = new PrintWriter(new FileOutputStream("app/src/main/java/am/aua/sas/jirc/exports/database.txt"));
+            // TODO: Save to Documents/Jirc/<current_date.txt>
+            writer = new PrintWriter(new FileOutputStream("database"));
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
         String content = channels.get(currentChannel).getChat().getText();
         writer.println(content);
+        writer.flush();
         writer.close();
     }
 
-
     private static class Channel {
         private static final GridBagConstraints constraints = new GridBagConstraints();
-        private JPanel panel;
-        private ChatPane chat;
-        private JScrollPane scrollPane;
+        private final JPanel panel;
+        private final ChatPane chat;
+        private final JScrollPane scrollPane;
 
         public Channel(JPanel panel, ChatPane chat, JScrollPane scrollPane) {
             this.panel = panel;
@@ -181,7 +179,6 @@ public class MainWindow extends JFrame {
             center.add(scrollPane, constraints);
 
             JTextField message = new JTextField();
-            // add placeholder here
             message.addActionListener((e) -> {
                 try {
                     client.sendMessage(channel, message.getText());
@@ -199,9 +196,7 @@ public class MainWindow extends JFrame {
             constraints.fill = GridBagConstraints.HORIZONTAL;
             center.add(message, constraints);
 
-            Channel c = new Channel(center, chat, scrollPane);
-
-            return c;
+            return new Channel(center, chat, scrollPane);
         }
     }
 }

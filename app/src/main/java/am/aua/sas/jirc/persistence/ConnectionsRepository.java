@@ -26,6 +26,7 @@ public class ConnectionsRepository implements AppendOnlyRepository<Server> {
     }
 
     private ConnectionsRepository(String source) throws IOException {
+        // TODO: Create in ~/.Jirc/
         File sourceFile = new File(source);
         sourceFile.createNewFile();
 

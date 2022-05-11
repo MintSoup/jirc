@@ -7,8 +7,7 @@ import am.aua.sas.jirc.persistence.ConnectionsRepository;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.HashSet;
 import java.util.Objects;
 
 public class ConnectionsWindow extends JFrame {
@@ -18,6 +17,8 @@ public class ConnectionsWindow extends JFrame {
 
     private final JPanel contentPanel = new JPanel();
     private final JPanel actionsPanel = new JPanel();
+
+    private final JTextField channelsField;
 
     private final GridBagConstraints constraints;
 
@@ -41,47 +42,57 @@ public class ConnectionsWindow extends JFrame {
         serverField.setEditable(true);
         serverField.setSelectedIndex(0);
         serverField.addActionListener((e) -> {
-                if (e.getActionCommand().equals("comboBoxEdited")) {
-                    Object selectedItem = serversModel.getSelectedItem();
-                    if (selectedItem == null) {
-                        return;
-                    }
-
-                    String[] parsedItem = selectedItem.toString().trim().split(":");
-                    Server newServer;
-                    // split() notoriously returns a non-empty array even if the string is empty
-                    if (parsedItem[0].length() == 0) {
-                        newServer = new Server(IRCClient.DEFAULT_SERVER, IRCClient.DEFAULT_PORT);
-                    } else if (parsedItem.length == 1) {
-                        newServer = new Server(parsedItem[0], IRCClient.DEFAULT_PORT);
-                    } else {
-                        newServer = new Server(parsedItem[0], Integer.parseInt(parsedItem[1]));
-                    }
-
-                    if (repository.add(newServer)) {
-                        serversModel.addElement(newServer);
-                    }
-                    serversModel.setSelectedItem(newServer);
+            if (e.getActionCommand().equals("comboBoxEdited")) {
+                Object selectedItem = serversModel.getSelectedItem();
+                if (selectedItem == null) {
+                    return;
                 }
+
+                String[] parsedItem = selectedItem.toString().trim().split(":");
+                Server newServer;
+                // split() notoriously returns a non-empty array even if the string is empty
+                if (parsedItem[0].length() == 0) {
+                    newServer = new Server(IRCClient.DEFAULT_SERVER, IRCClient.DEFAULT_PORT);
+                } else if (parsedItem.length == 1) {
+                    newServer = new Server(parsedItem[0], IRCClient.DEFAULT_PORT);
+                } else {
+                    newServer = new Server(parsedItem[0], Integer.parseInt(parsedItem[1]));
+                }
+
+                if (repository.add(newServer)) {
+                    serversModel.addElement(newServer);
+                }
+                serversModel.setSelectedItem(newServer);
+            }
         });
         this.addField(Strings.SERVER_LABEL, serverField);
 
         JTextField usernameField = new JTextField();
         this.addField(Strings.USERNAME_LABEL, usernameField);
 
+        channelsField = new JTextField();
+        this.addField(Strings.CHANNELS_LABEL, channelsField);
+
         JButton continueButton = new JButton(Strings.CONNECTIONS_WINDOW_BUTTON_OKAY);
         continueButton.addActionListener((e) -> {
-                Server selectedServer = (Server) Objects.requireNonNull(serverField.getSelectedItem());
-                String username = usernameField.getText().trim();
-                if (username.length() == 0) {
-                    showErrorMessage(Strings.BLANK_USERNAME_ERROR_MESSAGE);
-                    return;
-                }
+            Server selectedServer = (Server) Objects.requireNonNull(serverField.getSelectedItem());
 
-                IRCClient client = new IRCClient(selectedServer, username);
+            String username = usernameField.getText().trim();
+            if (username.length() == 0) {
+                JircGui.showErrorMessage(this, Strings.BLANK_USERNAME_ERROR_MESSAGE);
+                return;
+            }
 
-                JircGui.hide(ConnectionsWindow.this);
-                JircGui.show(new MainWindow(client, "#test", "#emacs"));
+            String[] channelList = getChannelList();
+            if (channelList.length == 0) {
+                JircGui.showErrorMessage(this, Strings.EMPTY_CHANNELS_ERROR_MESSAGE);
+                return;
+            }
+
+            IRCClient client = new IRCClient(selectedServer, username);
+
+            JircGui.hide(this);
+            JircGui.show(new MainWindow(client, channelList));
         });
         this.actionsPanel.add(continueButton);
     }
@@ -125,8 +136,17 @@ public class ConnectionsWindow extends JFrame {
         this.contentPanel.add(field, constraints);
     }
 
-    private void showErrorMessage(String message) {
-        JOptionPane.showMessageDialog(this, message, Strings.ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
+    private String[] getChannelList() {
+        String[] channels = channelsField.getText().split(",");
+        HashSet<String> channelSet = new HashSet<>();
+        for (String channel : channels) {
+            String channelName = channel.trim().toLowerCase();
+            if (IRCClient.validateChannelName(channelName)) {
+                channelSet.add(channelName);
+            }
+        }
+
+        return channelSet.toArray(new String[]{});
     }
 
     private static class FormLabel extends JLabel {

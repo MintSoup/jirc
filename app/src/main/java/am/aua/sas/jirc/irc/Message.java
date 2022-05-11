@@ -4,7 +4,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Message implements Comparable<Message> {
+public final class Message implements Comparable<Message> {
     private final String sender;
     private final String channel;
     private final String content;
