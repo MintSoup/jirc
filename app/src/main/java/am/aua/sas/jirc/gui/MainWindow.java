@@ -58,9 +58,7 @@ public class MainWindow extends JFrame {
 
         JTextField message = new JTextField();
         // add placeholder here
-        message.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        message.addActionListener((e) -> {
                 try {
                     client.sendMessage("#test", message.getText());
                 } catch (IOException ex) {
@@ -69,8 +67,7 @@ public class MainWindow extends JFrame {
                 Message m = new Message(client.getNickname(), "#test", message.getText(), new Date());
                 MainWindow.this.appendMine(m);
                 message.setText("");
-            }
-        });
+            });
         constraints.gridx = 0;
         constraints.gridy = 1;
         constraints.weightx = 1;
@@ -120,12 +117,7 @@ public class MainWindow extends JFrame {
 
         JMenu fileMenu = new JMenu(Strings.FILE_MENU_LABEL);
         JMenuItem about = new JMenuItem(Strings.ABOUT_WINDOW_TITLE);
-        about.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JircGui.show(new AboutWindow());
-            }
-        });
+        about.addActionListener((e) -> JircGui.show(new AboutWindow()));
         fileMenu.add(about);
         menuBar.add(fileMenu);
 
