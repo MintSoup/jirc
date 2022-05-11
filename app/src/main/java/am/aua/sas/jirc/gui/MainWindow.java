@@ -69,9 +69,7 @@ public class MainWindow extends JFrame {
 
         this.add(center, BorderLayout.CENTER);
 
-        listenerThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
+        listenerThread = new Thread(() -> {
                 try {
                     client.open();
                     for (int i = 0; i < autoJoin.length; i++) {
@@ -95,7 +93,6 @@ public class MainWindow extends JFrame {
                 } catch (IRCException e1) {
                     e1.printStackTrace();
                 }
-            }
         }, "Message Receiver");
         listenerThread.start();
     }
