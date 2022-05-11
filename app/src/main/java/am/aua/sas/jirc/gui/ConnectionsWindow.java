@@ -86,7 +86,7 @@ public class ConnectionsWindow extends JFrame {
                 IRCClient client = new IRCClient(selectedServer, username);
 
                 JircGui.hide(ConnectionsWindow.this);
-                JircGui.show(new MainWindow(client));
+                JircGui.show(new MainWindow(client, "#test", "#emacs"));
             }
         });
         this.actionsPanel.add(continueButton);

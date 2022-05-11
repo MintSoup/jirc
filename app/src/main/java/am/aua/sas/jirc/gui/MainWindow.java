@@ -2,81 +2,70 @@ package am.aua.sas.jirc.gui;
 
 import am.aua.sas.jirc.gui.intl.Strings;
 import am.aua.sas.jirc.irc.IRCClient;
-import am.aua.sas.jirc.irc.exceptions.IRCException;
 import am.aua.sas.jirc.irc.Message;
+import am.aua.sas.jirc.irc.exceptions.IRCException;
 
 import javax.swing.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.ContainerAdapter;
+import java.awt.event.ContainerEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
+import java.util.HashMap;
 
 public class MainWindow extends JFrame {
-    private final GridBagConstraints constraints = new GridBagConstraints();
-
     private final IRCClient client;
     private final Thread listenerThread;
+    private HashMap<String, Channel> channels;
+    private String currentChannel;
 
-    private final JTextPane chat;
-
-    private static final int INT_MESSAGE_COLOR = 0x98c379;
-    private static final int SERVER_LINE_COLOR = 0x767676;
-    private static final int DATE_COLOR = 0x51afef;
-    private static final int MY_NICKNAME_COLOR = 0xc678dd;
-    private static final int NICKNAME_COLOR = 0xd19a66;
-
-    public MainWindow(IRCClient client) {
+    public MainWindow(IRCClient client, String... autoJoin) {
         this.client = client;
+        this.channels = new HashMap<>();
+        this.currentChannel = autoJoin[0];
 
         this.initFrame();
 
         this.setUpMenuBar();
 
-        String[] buttons = new String[]{"Dummy1", "Dummy2", "Dummy3"};
-        JList<String> channels = new JList<>(buttons);
-        channels.setBackground(Color.GRAY);
-        channels.setPreferredSize(new Dimension(100, 640));
-        // channelsPrinter(channels, new String[]{"Dummy1", "Dummy2", "Dummy3"});
-        this.add(channels, BorderLayout.WEST);
+        JPanel center = new JPanel();
+        center.setLayout(new CardLayout());
 
-        JPanel center = new JPanel(new GridBagLayout());
-        chat = new JTextPane();
-        chat.setEditable(false);
-        chat.setPreferredSize(new Dimension(800, 800));
+        DefaultListModel<String> model = new DefaultListModel<>();
+        JList<String> channelList = new JList<>(model);
+        channelList.setBackground(Color.GRAY);
+        channelList.setPreferredSize(new Dimension(100, 640));
+        channelList.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int i = channelList.locationToIndex(e.getPoint());
+                String s = model.getElementAt(i);
+                currentChannel = s;
+                ((CardLayout) center.getLayout()).show(center, s);
+            }
 
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.weightx = 1;
-        constraints.weighty = 1;
-        constraints.fill = GridBagConstraints.BOTH;
-        center.add(chat, constraints);
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
 
-        JTextField message = new JTextField();
-        // add placeholder here
-        message.addActionListener((e) -> {
-                try {
-                    client.sendMessage("#test", message.getText());
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-                Message m = new Message(client.getNickname(), "#test", message.getText(), new Date());
-                MainWindow.this.appendMine(m);
-                message.setText("");
-            });
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        constraints.weightx = 1;
-        constraints.weighty = 0;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        center.add(message, constraints);
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        });
+        this.add(channelList, BorderLayout.WEST);
 
         this.add(center, BorderLayout.CENTER);
 
@@ -85,13 +74,20 @@ public class MainWindow extends JFrame {
             public void run() {
                 try {
                     client.open();
-                    client.join("#test");
-                    appendInternalMessage("Joined #test\n");
+                    for (int i = 0; i < autoJoin.length; i++) {
+                        client.join(autoJoin[i]);
+                        model.addElement(autoJoin[i]);
+                        Channel c = Channel.generateCenterBox(autoJoin[i], client);
+                        channels.put(autoJoin[i], c);
+                        center.add(c.getPanel(), autoJoin[i]);
+                    }
+                    //appendInternalMessage("Joined #test\n");
                     client.listenForMessages((r, m) -> {
-                        if (m != null)
-                            append(m);
-                        else
-                            appendServerLine(r + "\n");
+                        if (m != null) {
+                            Channel c = channels.get(m.getChannel());
+                            c.getChat().append(m);
+                        } else
+                            channels.get(currentChannel).getChat().appendServerLine(r);
                         return false;
                     });
                 } catch (IOException e) {
@@ -126,55 +122,87 @@ public class MainWindow extends JFrame {
 
         JMenu exportMenu = new JMenu(Strings.EXPORT_MENU_LABEL);
         JMenuItem exportCurrent = new JMenuItem(Strings.EXPORT_CURRENT_MENU_ITEM_LABEL);
-        exportCurrent.addActionListener((e) -> save());
+        //exportCurrent.addActionListener((e) -> save());
         exportMenu.add(exportCurrent);
         menuBar.add(exportMenu);
 
         this.setJMenuBar(menuBar);
     }
 
-    private void append(String message, int color, boolean bold) {
-        StyledDocument doc = chat.getStyledDocument();
-        SimpleAttributeSet keyWord = new SimpleAttributeSet();
-        StyleConstants.setFontSize(keyWord, 16);
-        StyleConstants.setBold(keyWord, bold);
-        StyleConstants.setForeground(keyWord, new Color(color));
-        try {
-            doc.insertString(doc.getLength(), message, keyWord);
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void append(Message m) {
-        append("[" + Message.DATE_FORMAT.format(m.getTimestamp()) + "] ", DATE_COLOR, true);
-        append("<" + m.getSender() + "> ", NICKNAME_COLOR, true);
-        append(m.getContent() + "\n", 0, false);
-    }
-
-    private void appendMine(Message m) {
-        append("[" + Message.DATE_FORMAT.format(m.getTimestamp()) + "] ", DATE_COLOR, true);
-        append("<" + m.getSender() + "> ", MY_NICKNAME_COLOR, true);
-        append(m.getContent() + "\n", 0, false);
-    }
-
-    private void appendServerLine(String line) {
-        append(line, SERVER_LINE_COLOR, false);
-    }
-
-    private void appendInternalMessage(String line) {
-        append(line, INT_MESSAGE_COLOR, true);
-    }
-
-    private void save(){
+    private void save() {
         PrintWriter writer = null;
         try {
             writer = new PrintWriter(new FileOutputStream("app/src/main/java/am/aua/sas/jirc/exports/database.txt"));
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        String content = chat.getText();
+        String content = channels.get(currentChannel).getChat().getText();
         writer.println(content);
         writer.close();
+    }
+
+
+    private static class Channel {
+        private static final GridBagConstraints constraints = new GridBagConstraints();
+        private JPanel panel;
+        private ChatPane chat;
+        private JScrollPane scrollPane;
+
+        public Channel(JPanel panel, ChatPane chat, JScrollPane scrollPane) {
+            this.panel = panel;
+            this.chat = chat;
+            this.scrollPane = scrollPane;
+        }
+
+        public JPanel getPanel() {
+            return panel;
+        }
+
+        public ChatPane getChat() {
+            return chat;
+        }
+
+        public JScrollPane getScrollPane() {
+            return scrollPane;
+        }
+
+        public static Channel generateCenterBox(String channel, IRCClient client) {
+            JPanel center = new JPanel(new GridBagLayout());
+
+            ChatPane chat = new ChatPane();
+            JScrollPane scrollPane = new JScrollPane(chat);
+            chat.setEditable(false);
+            chat.setPreferredSize(new Dimension(800, 800));
+
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            constraints.weightx = 1;
+            constraints.weighty = 1;
+            constraints.fill = GridBagConstraints.BOTH;
+            center.add(scrollPane, constraints);
+
+            JTextField message = new JTextField();
+            // add placeholder here
+            message.addActionListener((e) -> {
+                try {
+                    client.sendMessage(channel, message.getText());
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                Message m = new Message(client.getNickname(), channel, message.getText(), new Date());
+                chat.appendMine(m);
+                message.setText("");
+            });
+            constraints.gridx = 0;
+            constraints.gridy = 1;
+            constraints.weightx = 1;
+            constraints.weighty = 0;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            center.add(message, constraints);
+
+            Channel c = new Channel(center, chat, scrollPane);
+
+            return c;
+        }
     }
 }

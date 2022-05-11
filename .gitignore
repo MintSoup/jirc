@@ -10,3 +10,4 @@ build
 .settings/
 /app/.classpath
 /app/bin/
+connections
