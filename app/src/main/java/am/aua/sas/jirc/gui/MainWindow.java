@@ -45,6 +45,8 @@ public class MainWindow extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int i = channelList.locationToIndex(e.getPoint());
+                if (i == -1)
+                    return;
                 String s = model.getElementAt(i);
                 currentChannel = s;
                 ((CardLayout) center.getLayout()).show(center, s);
