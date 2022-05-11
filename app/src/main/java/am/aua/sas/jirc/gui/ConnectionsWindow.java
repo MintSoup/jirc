@@ -40,9 +40,7 @@ public class ConnectionsWindow extends JFrame {
         JComboBox<Server> serverField = new JComboBox<>(serversModel);
         serverField.setEditable(true);
         serverField.setSelectedIndex(0);
-        serverField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        serverField.addActionListener((e) -> {
                 if (e.getActionCommand().equals("comboBoxEdited")) {
                     Object selectedItem = serversModel.getSelectedItem();
                     if (selectedItem == null) {
@@ -65,7 +63,6 @@ public class ConnectionsWindow extends JFrame {
                     }
                     serversModel.setSelectedItem(newServer);
                 }
-            }
         });
         this.addField(Strings.SERVER_LABEL, serverField);
 
@@ -73,9 +70,7 @@ public class ConnectionsWindow extends JFrame {
         this.addField(Strings.USERNAME_LABEL, usernameField);
 
         JButton continueButton = new JButton(Strings.CONNECTIONS_WINDOW_BUTTON_OKAY);
-        continueButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+        continueButton.addActionListener((e) -> {
                 Server selectedServer = (Server) Objects.requireNonNull(serverField.getSelectedItem());
                 String username = usernameField.getText().trim();
                 if (username.length() == 0) {
@@ -87,7 +82,6 @@ public class ConnectionsWindow extends JFrame {
 
                 JircGui.hide(ConnectionsWindow.this);
                 JircGui.show(new MainWindow(client, "#test", "#emacs"));
-            }
         });
         this.actionsPanel.add(continueButton);
     }
