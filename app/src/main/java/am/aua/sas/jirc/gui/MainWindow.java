@@ -4,17 +4,17 @@ import am.aua.sas.jirc.gui.intl.Strings;
 import am.aua.sas.jirc.irc.IRCClient;
 import am.aua.sas.jirc.irc.Message;
 import am.aua.sas.jirc.irc.exceptions.IRCException;
+import am.aua.sas.jirc.irc.exceptions.NicknameAlreadyInUseException;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ContainerAdapter;
 import java.awt.event.ContainerEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -102,6 +102,17 @@ public class MainWindow extends JFrame {
     private void initFrame() {
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setLocationRelativeTo(null);
+        File file = new File("app/src/main/java/am/aua/sas/jirc/gui/jirc.png");
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(file);
+            this.setIconImage(image);
+            final Taskbar taskbar = Taskbar.getTaskbar();
+            taskbar.setIconImage(image);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle(Strings.APP_NAME);
