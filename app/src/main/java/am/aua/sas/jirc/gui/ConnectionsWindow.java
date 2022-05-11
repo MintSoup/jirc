@@ -5,8 +5,12 @@ import am.aua.sas.jirc.irc.IRCClient;
 import am.aua.sas.jirc.irc.Server;
 import am.aua.sas.jirc.persistence.ConnectionsRepository;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Objects;
 
@@ -102,6 +106,16 @@ public class ConnectionsWindow extends JFrame {
         this.setMinimumSize(SIZE);
         this.setPreferredSize(SIZE);
         this.setLocationRelativeTo(null);
+        File file = new File("app/src/main/java/am/aua/sas/jirc/gui/jirc.png");
+        BufferedImage image;
+        try {
+            image = ImageIO.read(file);
+            this.setIconImage(image);
+            final Taskbar taskbar = Taskbar.getTaskbar();
+            taskbar.setIconImage(image);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle(Strings.CONNECTIONS_WINDOW_TITLE);
