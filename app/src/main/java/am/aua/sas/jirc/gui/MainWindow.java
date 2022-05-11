@@ -71,6 +71,7 @@ public class MainWindow extends JFrame {
 
         listenerThread = new Thread(() -> {
                 try {
+                    this.setTitle("Loading...");
                     client.open();
                     for (int i = 0; i < autoJoin.length; i++) {
                         client.join(autoJoin[i]);
@@ -79,6 +80,7 @@ public class MainWindow extends JFrame {
                         channels.put(autoJoin[i], c);
                         center.add(c.getPanel(), autoJoin[i]);
                     }
+                    this.setTitle("Jirc");
                     //appendInternalMessage("Joined #test\n");
                     client.listenForMessages((r, m) -> {
                         if (m != null) {
