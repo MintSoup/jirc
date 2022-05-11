@@ -87,7 +87,9 @@ public class MainWindow extends JFrame {
                     if (m != null) {
                         Channel c = channels.get(m.getChannel());
                         c.getChat().append(m);
-                    } else channels.get(currentChannel).getChat().appendServerLine(r);
+                    } else {
+                        //channels.get(currentChannel).getChat().appendServerLine(r);
+                    }
                     return false;
                 });
             } catch (IOException e) {
