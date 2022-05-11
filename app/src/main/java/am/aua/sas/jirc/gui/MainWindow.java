@@ -13,7 +13,10 @@ import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Date;
 
 public class MainWindow extends JFrame {
@@ -58,9 +61,7 @@ public class MainWindow extends JFrame {
 
         JTextField message = new JTextField();
         // add placeholder here
-        message.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        message.addActionListener((e) -> {
                 try {
                     client.sendMessage("#test", message.getText());
                 } catch (IOException ex) {
@@ -69,8 +70,7 @@ public class MainWindow extends JFrame {
                 Message m = new Message(client.getNickname(), "#test", message.getText(), new Date());
                 MainWindow.this.appendMine(m);
                 message.setText("");
-            }
-        });
+            });
         constraints.gridx = 0;
         constraints.gridy = 1;
         constraints.weightx = 1;
@@ -86,12 +86,12 @@ public class MainWindow extends JFrame {
                 try {
                     client.open();
                     client.join("#test");
-                    MainWindow.this.appendInternalMessage("Joined #test\n");
+                    appendInternalMessage("Joined #test\n");
                     client.listenForMessages((r, m) -> {
                         if (m != null)
-                            MainWindow.this.append(m);
+                            append(m);
                         else
-                            MainWindow.this.appendServerLine(r + "\n");
+                            appendServerLine(r + "\n");
                         return false;
                     });
                 } catch (IOException e) {
@@ -120,23 +120,13 @@ public class MainWindow extends JFrame {
 
         JMenu fileMenu = new JMenu(Strings.FILE_MENU_LABEL);
         JMenuItem about = new JMenuItem(Strings.ABOUT_WINDOW_TITLE);
-        about.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JircGui.show(new AboutWindow());
-            }
-        });
+        about.addActionListener((e) -> JircGui.show(new AboutWindow()));
         fileMenu.add(about);
         menuBar.add(fileMenu);
 
         JMenu exportMenu = new JMenu(Strings.EXPORT_MENU_LABEL);
         JMenuItem exportCurrent = new JMenuItem(Strings.EXPORT_CURRENT_MENU_ITEM_LABEL);
-        exportCurrent.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO
-            }
-        });
+        exportCurrent.addActionListener((e) -> save());
         exportMenu.add(exportCurrent);
         menuBar.add(exportMenu);
 
@@ -174,5 +164,17 @@ public class MainWindow extends JFrame {
 
     private void appendInternalMessage(String line) {
         append(line, INT_MESSAGE_COLOR, true);
+    }
+
+    private void save(){
+        PrintWriter writer = null;
+        try {
+            writer = new PrintWriter(new FileOutputStream("app/src/main/java/am/aua/sas/jirc/exports/database.txt"));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        String content = chat.getText();
+        writer.println(content);
+        writer.close();
     }
 }

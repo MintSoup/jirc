@@ -20,12 +20,7 @@ public class AboutWindow extends JFrame {
         this.add(text, constraints);
 
         JButton ok = new JButton(Strings.ABOUT_WINDOW_BUTTON_OKAY);
-        ok.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JircGui.hide(AboutWindow.this);
-            }
-        });
+        ok.addActionListener((e) -> JircGui.hide(AboutWindow.this));
         constraints.gridy++;
         this.add(ok, constraints);
     }
