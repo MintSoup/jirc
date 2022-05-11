@@ -6,8 +6,8 @@ public class Quit extends Command {
 
 	private static final int[] replies = {};
 
-	public Quit(String channel) {
-		this.reason = channel;
+	public Quit(String reason) {
+		this.reason = reason;
 	}
 
 	public Quit() {
