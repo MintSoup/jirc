@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -41,6 +42,12 @@ public class MainWindow extends JFrame {
         JList<String> channelList = new JList<>(model);
         channelList.setBackground(new Color(0x98c379));
         channelList.setPreferredSize(new Dimension(100, 640));
+        /*channelList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+            }
+        });*/
         channelList.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
