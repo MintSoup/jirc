@@ -6,6 +6,10 @@ import am.aua.sas.jirc.irc.Message;
 import am.aua.sas.jirc.irc.exceptions.IRCException;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
