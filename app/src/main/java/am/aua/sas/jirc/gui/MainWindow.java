@@ -11,14 +11,17 @@ import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class MainWindow extends JFrame {
     private final IRCClient client;
@@ -42,37 +45,17 @@ public class MainWindow extends JFrame {
         JList<String> channelList = new JList<>(model);
         channelList.setBackground(new Color(0x98c379));
         channelList.setPreferredSize(new Dimension(100, 640));
-        /*channelList.addMouseListener(new MouseAdapter() {
+        channelList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-            }
-        });*/
-        channelList.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
+
                 int i = channelList.locationToIndex(e.getPoint());
                 if (i == -1)
                     return;
                 String s = model.getElementAt(i);
                 currentChannel = s;
                 ((CardLayout) center.getLayout()).show(center, s);
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
             }
         });
         this.add(channelList, BorderLayout.WEST);
@@ -115,14 +98,14 @@ public class MainWindow extends JFrame {
         this.setLocationRelativeTo(null);
 
         try {
-            File file = new File(getClass().getResource("/jirc.png").getFile());
+            File file = new File(Objects.requireNonNull(getClass().getResource("/jirc.png")).getFile());
             BufferedImage image = ImageIO.read(file);
             this.setIconImage(image);
             if (Taskbar.isTaskbarSupported()) {
                 final Taskbar taskbar = Taskbar.getTaskbar();
                 taskbar.setIconImage(image);
             }
-        } catch (IOException ignored) {
+        } catch (Exception ignored) {
         }
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

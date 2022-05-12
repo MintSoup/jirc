@@ -10,7 +10,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Objects;
 
@@ -108,14 +107,14 @@ public class ConnectionsWindow extends JFrame {
         this.setLocationRelativeTo(null);
 
         try {
-            File file = new File(getClass().getResource("/jirc.png").getFile());
+            File file = new File(Objects.requireNonNull(getClass().getResource("/jirc.png")).getFile());
             BufferedImage image = ImageIO.read(file);
             this.setIconImage(image);
             if (Taskbar.isTaskbarSupported()) {
                 final Taskbar taskbar = Taskbar.getTaskbar();
                 taskbar.setIconImage(image);
             }
-        } catch (IOException ignored) {
+        } catch (Exception ignored) {
         }
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
