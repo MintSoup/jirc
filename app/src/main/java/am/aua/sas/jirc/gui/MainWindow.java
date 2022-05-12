@@ -1,17 +1,17 @@
 package am.aua.sas.jirc.gui;
 
-import am.aua.sas.jirc.gui.intl.Strings;
-import am.aua.sas.jirc.irc.IRCClient;
-import am.aua.sas.jirc.irc.Message;
-import am.aua.sas.jirc.irc.exceptions.IRCException;
-import am.aua.sas.jirc.irc.exceptions.NicknameAlreadyInUseException;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.filechooser.FileSystemView;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.LayoutManager;
+import java.awt.Taskbar;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,6 +23,24 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
+
+import javax.imageio.ImageIO;
+import javax.swing.DefaultListModel;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.filechooser.FileSystemView;
+
+import am.aua.sas.jirc.gui.intl.Strings;
+import am.aua.sas.jirc.irc.IRCClient;
+import am.aua.sas.jirc.irc.Message;
+import am.aua.sas.jirc.irc.exceptions.IRCException;
+import am.aua.sas.jirc.irc.exceptions.NicknameAlreadyInUseException;
 
 public class MainWindow extends JFrame {
 	private final IRCClient client;
@@ -62,6 +80,17 @@ public class MainWindow extends JFrame {
 		this.add(channelList, BorderLayout.WEST);
 
 		this.add(center, BorderLayout.CENTER);
+
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+				try {
+					client.quit();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+            }
+        });
+
 
 		listenerThread = new Thread(() -> {
 			try {
